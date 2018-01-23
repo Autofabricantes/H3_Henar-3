@@ -1,0 +1,1 @@
+The HW used by the H3_SWPad_Big_Rev_3 is the same as H3_SWPad_Small_Rev_3, therefore this folder is empty.
