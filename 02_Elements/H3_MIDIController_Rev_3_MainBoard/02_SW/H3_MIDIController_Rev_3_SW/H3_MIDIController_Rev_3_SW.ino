@@ -82,6 +82,7 @@ const byte EFCT_R_ON   =   0  ;const byte EFCT_G_ON   = 100   ;const byte EFCT_B
 const byte MENU_R_ON   =   0  ;const byte MENU_G_ON   = 255   ;const byte MENU_B_ON  = 255;  // SW_MENU ON LED COLOR
 const byte PANIC_R_ON  = 255  ;const byte PANIC_G_ON  =   0   ;const byte PANIC_B_ON =   0;  // SW_MENU ON LED COLOR
 const byte NUSE_R_ON   =   0  ;const byte NUSE_G_ON   = 255   ;const byte NUSE_B_ON  =   0;  // SW_MENU ON LED COLOR
+const byte SEQ_R_ON    =   0  ;const byte SEQ_G_ON    = 255   ;const byte SEQ_B_ON   = 100;  // SW_SEQ ON LED COLOR
 
 // Control Arrays for SW_Pad
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -90,12 +91,14 @@ const byte NUSE_R_ON   =   0  ;const byte NUSE_G_ON   = 255   ;const byte NUSE_B
 const int SW_MODE_Q  = 12  ;const int SW_MODE_ACT  = 0   ;int SW_MODE  = 0   ;int SW_MODE_INIT   = 0;                       // SW_MODE
 const int SW_INSTR_Q =  6  ;const int SW_INSTR_ACT = 1   ;int SW_INSTR = 0   ;int SW_INSTR_INIT  = SW_MODE_Q;               // SW_INSTR
 const int SW_SCALE_Q =  6  ;const int SW_SCALE_ACT = 2   ;int SW_SCALE = 0   ;int SW_SCALE_INIT  = (SW_SCALE_Q + SW_MODE_Q);// SW_SCALE
-const int SW_EFCT_Q  =  6  ;const int SW_EFCT_ACT  = 3   ;int SW_EFCT  = 0   ;int SW_EFCT_INIT   = 0;
-const int SW_MODU_Q  =  6  ;const int SW_MODU_ACT  = 4   ;int SW_MODU  = 0   ;int SW_MODU_INIT   = SW_EFCT_Q;
-const int SW_OCTV_Q  =  6  ;const int SW_OCTV_ACT  = 5   ;int SW_OCTV  = 2   ;int SW_OCTV_INIT   = (SW_EFCT_Q + SW_MODU_Q);
-const int SW_VOL_Q   =  6  ;const int SW_VOL_ACT   = 6   ;int SW_VOL   = 5   ;int SW_VOL_INIT    = (SW_EFCT_Q + SW_MODU_Q + SW_OCTV_Q);
-const int SW_PANIC_Q =  1  ;const int SW_PANIC_ACT = 7   ;int SW_PANIC = 0   ;int SW_PANIC_INIT  = (SW_EFCT_Q + SW_MODU_Q + SW_OCTV_Q + SW_VOL_Q);
-const int SW_MENU_Q  =  1  ;const int SW_MENU_ACT = 8    ;int SW_MENU  = 0   ;int SW_MENU_INIT   = (SW_EFCT_Q + SW_MODU_Q + SW_OCTV_Q + SW_VOL_Q + SW_PANIC_Q);
+const int SW_SEQ_Q  = 12  ;const int SW_SEQ_ACT  = 9     ;int SW_SEQ  = 0   ;int SW_SEQ_INIT   = 0;                         // SW_MODE
+//const int SW_EFCT_Q  =  6  ;const int SW_EFCT_ACT  = 3   ;int SW_EFCT  = 0   ;int SW_EFCT_INIT   = 0;
+//const int SW_MODU_Q  =  6  ;const int SW_MODU_ACT  = 4   ;int SW_MODU  = 0   ;int SW_MODU_INIT   = SW_EFCT_Q;
+//const int SW_OCTV_Q  =  6  ;const int SW_OCTV_ACT  = 5   ;int SW_OCTV  = 2   ;int SW_OCTV_INIT   = (SW_EFCT_Q + SW_MODU_Q);
+const int SW_OCTV_Q  =  6  ;const int SW_OCTV_ACT  = 5   ;int SW_OCTV  = 2   ;int SW_OCTV_INIT   = SW_SEQ_Q;
+const int SW_VOL_Q   =  6  ;const int SW_VOL_ACT   = 6   ;int SW_VOL   = 5   ;int SW_VOL_INIT    = (SW_SEQ_Q + SW_OCTV_Q);
+const int SW_PANIC_Q =  1  ;const int SW_PANIC_ACT = 7   ;int SW_PANIC = 0   ;int SW_PANIC_INIT  = (SW_SEQ_Q + SW_OCTV_Q + SW_VOL_Q);
+const int SW_MENU_Q  =  1  ;const int SW_MENU_ACT = 8    ;int SW_MENU  = 0   ;int SW_MENU_INIT   = (SW_SEQ_Q + SW_OCTV_Q + SW_VOL_Q + SW_PANIC_Q);
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // -----------------------------------------------------Control Arrays for PZ PAD-----------------------------------------------------------
@@ -181,14 +184,15 @@ void loop() {
       SW_INSTR = SW_Read(SW_INSTR_INIT, SW_INSTR_Q, SW_INSTR, SW_INSTR_ACT, INSTR_R_ON, INSTR_G_ON, INSTR_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
     break;
     default:
-      SW_EFCT = SW_Read(SW_EFCT_INIT, SW_EFCT_Q, SW_EFCT, SW_EFCT_ACT, EFCT_R_ON, EFCT_G_ON, EFCT_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-      SW_MODU = SW_Read(SW_MODU_INIT, SW_MODU_Q, SW_MODU, SW_MODU_ACT, MODU_R_ON, MODU_G_ON, MODU_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
+      //SW_EFCT = SW_Read(SW_EFCT_INIT, SW_EFCT_Q, SW_EFCT, SW_EFCT_ACT, EFCT_R_ON, EFCT_G_ON, EFCT_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
+      //SW_MODU = SW_Read(SW_MODU_INIT, SW_MODU_Q, SW_MODU, SW_MODU_ACT, MODU_R_ON, MODU_G_ON, MODU_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
       SW_OCTV = SW_Read(SW_OCTV_INIT, SW_OCTV_Q, SW_OCTV, SW_OCTV_ACT, OCTV_R_ON, OCTV_G_ON, OCTV_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
       SW_VOL = SW_Read(SW_VOL_INIT, SW_VOL_Q, SW_VOL, SW_VOL_ACT, VOL_R_ON, VOL_G_ON, VOL_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
+      SW_SEQ = SW_Read(SW_SEQ_INIT, SW_SEQ_Q, SW_SEQ, SW_SEQ_ACT, SEQ_R_ON, SEQ_G_ON, SEQ_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
     break;
   }
   SW_MENU_Read(SW_MENU_INIT, MENU_R_ON, MENU_G_ON, MENU_B_ON, (GEN_R_OFF + BIG_R), (GEN_G_OFF + BIG_G), (GEN_B_OFF + BIG_B), FADESTEPS_C, (FADEDELAY_C));
-  //SW_PANIC_Read(SW_PANIC_INIT, PANIC_R_ON, PANIC_G_ON, PANIC_B_ON, (GEN_R_OFF + BIG_R), (GEN_G_OFF + BIG_G), (GEN_B_OFF + BIG_B), FADESTEPS_C, (FADEDELAY_C));
+  SW_PANIC_Read(SW_PANIC_INIT, PANIC_R_ON, PANIC_G_ON, PANIC_B_ON, (GEN_R_OFF + BIG_R), (GEN_G_OFF + BIG_G), (GEN_B_OFF + BIG_B), FADESTEPS_C, (FADEDELAY_C));
   PZ_PAD_Read();
 }
 
@@ -247,26 +251,32 @@ void SW_Action(int SW_ACTION, int SW_VAR){
       delay(500);
       MIDI_TX(SW_INSTR,PZ_MIDI_BYTE_1[0][(PZ_Q-1)],(PZ_MIDI_BYTE_2[SW_SCALE][(PZ_Q-1)]+SW_MODE+(12*SW_VAR)),0);
     break;
-    case(SW_EFCT_ACT): //case(SW_MODU_ACT): // Configure and Play Note with New configuration
+    /*case(SW_EFCT_ACT): //case(SW_MODU_ACT): // Configure and Play Note with New configuration
       MIDI_TX(SW_INSTR, CONTROL, CTRL_EFCT1, map(SW_VAR, 0, 5, 0, 127));
       delay(50);
       MIDI_TX(SW_INSTR,PZ_MIDI_BYTE_1[0][(PZ_Q-1)],(PZ_MIDI_BYTE_2[SW_SCALE][(PZ_Q-1)]+SW_MODE+(12*SW_OCTV)), map(analogRead(MUX_2),PZ_THR,1024,80,127));
       delay(500);
       MIDI_TX(SW_INSTR,PZ_MIDI_BYTE_1[0][(PZ_Q-1)],(PZ_MIDI_BYTE_2[SW_SCALE][(PZ_Q-1)]+SW_MODE+(12*SW_OCTV)),0);
-    break;
-    case(SW_MODU_ACT): //case(SW_MODU_ACT): // Configure and Play Note with New configuration
+    break;*/
+    /*case(SW_MODU_ACT): //case(SW_MODU_ACT): // Configure and Play Note with New configuration
       MIDI_TX(SW_INSTR, CONTROL, CTRL_MOD, map(SW_VAR, 0, 5, 0, 127));
       delay(50);
       MIDI_TX(SW_INSTR,PZ_MIDI_BYTE_1[0][(PZ_Q-1)],(PZ_MIDI_BYTE_2[SW_SCALE][(PZ_Q-1)]+SW_MODE+(12*SW_OCTV)), map(analogRead(MUX_2),PZ_THR,1024,80,127));
       delay(500);
       MIDI_TX(SW_INSTR,PZ_MIDI_BYTE_1[0][(PZ_Q-1)],(PZ_MIDI_BYTE_2[SW_SCALE][(PZ_Q-1)]+SW_MODE+(12*SW_OCTV)),0);
-    break;
+    break;*/
     case(SW_VOL_ACT): //case(SW_VOL_ACT): // Configure and Play Note with New configuration
       MIDI_TX(SW_INSTR, CONTROL, CTRL_VOL, map(SW_VAR, 0, 5, 0, 127));
       delay(50);
       MIDI_TX(SW_INSTR,PZ_MIDI_BYTE_1[0][(PZ_Q-1)],(PZ_MIDI_BYTE_2[SW_SCALE][(PZ_Q-1)]+SW_MODE+(12*SW_OCTV)), map(analogRead(MUX_2),PZ_THR,1024,80,127));
       delay(500);
       MIDI_TX(SW_INSTR,PZ_MIDI_BYTE_1[0][(PZ_Q-1)],(PZ_MIDI_BYTE_2[SW_SCALE][(PZ_Q-1)]+SW_MODE+(12*SW_OCTV)),0);
+    break;
+    case(SW_SEQ_ACT): //case(SW_SEQ_ACT): // Configure and Play Note with New configuration
+      MIDI_TX(7, NOTE_ON, SW_SEQ, 127); //TODO
+      delay(500);
+      MIDI_TX(7, NOTE_OFF, SW_SEQ, 0); //TODO
+      //delay(500);
     break;
   }
 }
@@ -281,8 +291,9 @@ void SW_MENU_Read(int INIT_SW, int R_ON, int G_ON, int B_ON, int R_OFF, int G_OF
         SW_MENU = 1;
 
         SW_LED_ColumnFade(SW_MODE_INIT, SW_MODE_Q, SW_MODE, 0, MODE_R_ON, MODE_G_ON, MODE_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-        SW_LED_ColumnFade(SW_EFCT_INIT, SW_EFCT_Q, 0, SW_EFCT, EFCT_R_ON, EFCT_G_ON, EFCT_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C); // Update LED Stripe
-        SW_LED_ColumnFade(SW_MODU_INIT, SW_MODU_Q, 0, SW_MODU, MODU_R_ON, MODU_G_ON, MODU_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C); // Update LED Stripe
+        //SW_LED_ColumnFade(SW_EFCT_INIT, SW_EFCT_Q, 0, SW_EFCT, EFCT_R_ON, EFCT_G_ON, EFCT_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C); // Update LED Stripe
+        SW_LED_ColumnFade(SW_SEQ_INIT, SW_SEQ_Q, SW_SEQ, 0, SEQ_R_ON, SEQ_G_ON, SEQ_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
+        //SW_LED_ColumnFade(SW_MODU_INIT, SW_MODU_Q, 0, SW_MODU, MODU_R_ON, MODU_G_ON, MODU_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C); // Update LED Stripe
 
         SW_LED_ColumnFade(SW_INSTR_INIT, SW_INSTR_Q, SW_INSTR, 0, INSTR_R_ON, INSTR_G_ON, INSTR_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
         SW_LED_ColumnFade(SW_OCTV_INIT, SW_OCTV_Q, 0, SW_OCTV, OCTV_R_ON, OCTV_G_ON, OCTV_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C); // Update LED Stripe
@@ -293,8 +304,9 @@ void SW_MENU_Read(int INIT_SW, int R_ON, int G_ON, int B_ON, int R_OFF, int G_OF
       else{
         SW_MENU = 0;
         
-        SW_LED_ColumnFade(SW_EFCT_INIT, SW_EFCT_Q, SW_EFCT, 0, EFCT_R_ON, EFCT_G_ON, EFCT_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-        SW_LED_ColumnFade(SW_MODU_INIT, SW_MODU_Q, SW_MODU, 0, MODU_R_ON, MODU_G_ON, MODU_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
+        //SW_LED_ColumnFade(SW_EFCT_INIT, SW_EFCT_Q, SW_EFCT, 0, EFCT_R_ON, EFCT_G_ON, EFCT_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
+        //SW_LED_ColumnFade(SW_MODU_INIT, SW_MODU_Q, SW_MODU, 0, MODU_R_ON, MODU_G_ON, MODU_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
+        SW_LED_ColumnFade(SW_SEQ_INIT, SW_SEQ_Q, SW_SEQ, 0, SEQ_R_ON, SEQ_G_ON, SEQ_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
         SW_LED_ColumnFade(SW_MODE_INIT, SW_MODE_Q, 0, SW_MODE, MODE_R_ON, MODE_G_ON, MODE_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C); // Update LED Stripe
         
         SW_LED_ColumnFade(SW_OCTV_INIT, SW_OCTV_Q, SW_OCTV, 0, OCTV_R_ON, OCTV_G_ON, OCTV_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
@@ -315,9 +327,10 @@ void SW_PANIC_Read(int INIT_SW, int R_ON, int G_ON, int B_ON, int R_OFF, int G_O
       SW_CTRL[INIT_SW]=ON;
       ledPadStripe.setPixelColor(SW_PANIC_INIT, PANIC_G_ON, PANIC_R_ON, PANIC_B_ON);   
       ledPadStripe.show(); // Update LEDs
-      for(int i = 0; i < 6; i++){
-        MIDIOFF_FIX(i, 0, 127);
+      for(int i = 0; i < 8; i++){
+        MIDI_TX(i, CONTROL, CTRL_NOTEOFF, 0);
       }
+    }
   }else{
     if(SW_CTRL[INIT_SW]){
       SW_CTRL[INIT_SW]=OFF;
@@ -325,7 +338,6 @@ void SW_PANIC_Read(int INIT_SW, int R_ON, int G_ON, int B_ON, int R_OFF, int G_O
       ledPadStripe.show(); // Update LEDs
      }
    }    // Set SW_Pad as OFF 
-  }
 }
 
 // PZ_Pad Read Function
