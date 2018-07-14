@@ -1,3 +1,5 @@
+
+
 // Name: H3_MIDIController_Rev_3_SW
 // Programmer: Pablo dMM (Pablodmm.isp@gmail.com)
 // Date: Novemeber 2017
@@ -6,7 +8,7 @@
 // Library Import
 #include <Adafruit_NeoPixel.h>
 #include <MIDIUSB.h>
-
+#include <Streaming.h>
 
 //# define SERIAL_DEBUG
 //# define SERIAL_DEBUG_PZ
@@ -75,14 +77,17 @@ const bool ON          =   1;         // General ON value
 const bool OFF         =   0;         // General OFF value
 int muxSel[4] = {MUX_D, MUX_C, MUX_B, MUX_A}; // MUX Selector Pins
 const int MAX_MIDI_VEL        = 127;
-const int SW_ITE              = 0;
-const int SW_ITE_MAX          = 5;
-const int SW_Q                = 22;
+const int SW_ITE              =   0;
+const int SW_ITE_MAX          =   5;
+const int SW_Q                =  22;
 const int SW_THR              = 512; // Switch Threshold (Fake Digital)
 int   MENU_MODE               =   0; // Menu Mode Flag (Values 0, 1)
 const int FADESTEPS_C         =   6; // GENERAL FadeSteps
 const int FADEDELAY_C         =  10; // GENERAL FadeDelay
-const int MUX_SETUP_DELAY     =  10; // Mux Delay for PZPad
+const int MUX_SETUP_DELAY     =   7; // Mux Delay for PZPad
+const int PZ_MEASURE_CYCLE    =   3;
+const int PZ_AUTOCAL_CYCLES   =  30;
+const int PZ_GEN_THR          =   2;
 
 // Generated Structures (struct)
 struct SWPAD{
@@ -93,10 +98,13 @@ struct SWPAD{
 };
 
 struct PZPAD{
+  int   pzID;
   int   muxPos;
   int   pzThr;
   bool  pzAct;
   int   muxID;
+  int   pzVal[PZ_MEASURE_CYCLE];
+  int   pzLastMax;
 };
 
 
@@ -111,13 +119,13 @@ struct SWCTRL{
   int    ctrlVal;
 };
 
-PZPAD PZA = {4, 20, 0, MUX_2};
-PZPAD PZB = {5, 200, 0, MUX_2};
-PZPAD PZC = {6, 20, 0, MUX_2};
-PZPAD PZD = {3, 20, 0, MUX_2};
-PZPAD PZE = {2, 20, 0, MUX_2};
-PZPAD PZF = {1, 20, 0, MUX_2};
-PZPAD PZG = {0, 20, 0, MUX_2};
+PZPAD PZA = {0, 4, 15, 0, MUX_2};
+PZPAD PZB = {1, 5, 5, 0, MUX_2};
+PZPAD PZC = {2, 6, 5, 0, MUX_2};
+PZPAD PZD = {3, 3, 5, 0, MUX_2};
+PZPAD PZE = {4, 2, 5, 0, MUX_2};
+PZPAD PZF = {5, 1, 5, 0, MUX_2};
+PZPAD PZG = {6, 0, 5, 0, MUX_2};
 
 SWPAD SWA0 = {5,17,0,MUX_1};
 SWPAD SWA1 = {10,18,0,MUX_1};
@@ -269,38 +277,28 @@ void setup() {
   pinMode(MUX_C, OUTPUT);
   pinMode(MUX_D, OUTPUT);
 
-  SW_LED_Initialization();
-  SET_MUXGATE(PZ_ROW[6].muxPos);
+  SW_LED_Initialization_Start();
+  PZ_PAD_Autocalibration();
+  SW_LED_Initialization_End();
 }
 
 void loop() {
-    /*SW_MODE.ctrlVal = readSW_ROW(SW_ROW_D, SW_MODE, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-    SW_INSTR.ctrlVal = readSW_ROW(SW_ROW_C, SW_INSTR, INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-    SW_OCTV.ctrlVal = readSW_ROW(SW_ROW_B, SW_OCTV, OCTV_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-    SW_SCALE.ctrlVal = readSW_ROW(SW_ROW_A, SW_SCALE, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-    //PZ_PAD_Read();*/
-    PZ_PAD_Read_Single(0);
+    if(ITER == 3){
+      ITER = 0;
+      SW_MODE.ctrlVal = readSW_ROW(SW_ROW_D, SW_MODE, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+      SW_INSTR.ctrlVal = readSW_ROW(SW_ROW_C, SW_INSTR, INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+      SW_OCTV.ctrlVal = readSW_ROW(SW_ROW_B, SW_OCTV, OCTV_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+      SW_SCALE.ctrlVal = readSW_ROW(SW_ROW_A, SW_SCALE, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+    }
+    ITER++;
+    PZ_PAD_Read();
+    /*for (int i = 0; i < PZ_MEASURE_CYCLE; i++){
+      Serial.println(PZ_ROW[0].pzVal[i]); //TOREMOVE
+      delay(1);
+    }*/
+    //Serial.println(PZ_PAD_Calculate_RMS(PZ_ROW[0]));
+    //Serial.println(PZ_PAD_Read_Single(PZA, 0));
 
-  //SW_MODE = (SW_MTX_C, 1, SW_MODE, SW_MODE_ACT, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-  /*switch(SW_MENU){
-    case (0):
-      SW_MODE = SW_Read(SW_MTX_A[5][3], SW_MODE_Q, SW_MODE, SW_MODE_ACT, MODE_R_ON, MODE_G_ON, MODE_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-
-      SW_SCALE = SW_Read(SW_SCALE_INIT, SW_SCALE_Q, SW_SCALE, SW_SCALE_ACT, SCALE_R_ON, SCALE_G_ON, SCALE_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-      SW_INSTR = SW_Read(SW_INSTR_INIT, SW_INSTR_Q, SW_INSTR, SW_INSTR_ACT, INSTR_R_ON, INSTR_G_ON, INSTR_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-    break;
-    default:
-      //SW_EFCT = SW_Read(SW_EFCT_INIT, SW_EFCT_Q, SW_EFCT, SW_EFCT_ACT, EFCT_R_ON, EFCT_G_ON, EFCT_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-      //SW_MODU = SW_Read(SW_MODU_INIT, SW_MODU_Q, SW_MODU, SW_MODU_ACT, MODU_R_ON, MODU_G_ON, MODU_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-      SW_OCTV = SW_Read(SW_OCTV_INIT, SW_OCTV_Q, SW_OCTV, SW_OCTV_ACT, OCTV_R_ON, OCTV_G_ON, OCTV_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-      SW_VOL = SW_Read(SW_VOL_INIT, SW_VOL_Q, SW_VOL, SW_VOL_ACT, VOL_R_ON, VOL_G_ON, VOL_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-      SW_SEQ = SW_Read(SW_SEQ_INIT, SW_SEQ_Q, SW_SEQ, SW_SEQ_ACT, SEQ_R_ON, SEQ_G_ON, SEQ_B_ON, GEN_R_OFF, GEN_G_OFF, GEN_B_OFF, FADESTEPS_C, FADEDELAY_C);
-    break;
-  }
-  SW_MENU_Read(SW_MENU_INIT, MENU_R_ON, MENU_G_ON, MENU_B_ON, (GEN_R_OFF + BIG_R), (GEN_G_OFF + BIG_G), (GEN_B_OFF + BIG_B), FADESTEPS_C, (FADEDELAY_C));
-  SW_PANIC_Read(SW_PANIC_INIT, PANIC_R_ON, PANIC_G_ON, PANIC_B_ON, (GEN_R_OFF + BIG_R), (GEN_G_OFF + BIG_G), (GEN_B_OFF + BIG_B), FADESTEPS_C, (FADEDELAY_C));
-  */
-  //PZ_PAD_Read();
 }
 
 int readSW_ROW(SWPAD SW_ROW[], SWCTRL SW_CTRL, LEDCOL COL_ON, LEDCOL COL_OFF, int fadeSteps, int fadeDelay){
@@ -327,69 +325,28 @@ int readSW_ROW(SWPAD SW_ROW[], SWCTRL SW_CTRL, LEDCOL COL_ON, LEDCOL COL_OFF, in
    return SW_CTRL.ctrlVal;
 }
 
-void  SW_LED_Initialization(void){
-  for (int i = 0; i < 120; i++){    // Canvas SW OFF
-    ledPadStripe.setPixelColor(SWE.ledPos, (i*2), (i*2), (i*2)); // Heavy Stuffç
-    ledPadStripe.setPixelColor(SWF.ledPos, (i*2), (i*2), (i*2)); // Heavy Stuffç
-    ledPadStripe.show(); // Update LEDs
-    delay(10);
-  }
-  for (int h = 0; h < 5; h++){
-    for (int i = 0; i < 120; i++){
-      ledPadStripe.setPixelColor(SW_ROW_A[h].ledPos, (i*2), (i*2), (i*2)); // Heavy Stuff
-      ledPadStripe.setPixelColor(SW_ROW_B[h].ledPos, (i*2), (i*2), (i*2)); // Heavy Stuff
-      ledPadStripe.setPixelColor(SW_ROW_C[h].ledPos, (i*2), (i*2), (i*2)); // Heavy Stuff
-      ledPadStripe.setPixelColor(SW_ROW_D[h].ledPos, (i*2), (i*2), (i*2)); // Heavy Stuff
-      ledPadStripe.show(); // Update LEDs
-      delay(2);
-    }
-  }
 
-  SW_LED_ColumnFade(SW_ROW_D, SW_MODE, 0, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-  SW_LED_ColumnFade(SW_ROW_C, SW_INSTR, 0,INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-  SW_LED_ColumnFade(SW_ROW_B, SW_OCTV, 0,OCTV_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-  SW_LED_ColumnFade(SW_ROW_A, SW_SCALE, 0,SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-
-}
 
 void SW_LED_ColumnFade(SWPAD SW_ROW[], SWCTRL SW_CTRL, int prevON, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){
-   /*for (int i = 0; i < 5; i++){    // Canvas SW OFF
-     ledPadStripe.setPixelColor(SW_ROW[i].ledPos, COL_OFF.green, COL_OFF.red, COL_OFF.blue); // Heavy Stuff
-   }
-   ledPadStripe.setPixelColor(SW_ROW[SW_CTRL.ctrlVal].ledPos, COL_ON.green, COL_ON.red, COL_ON.blue); // Heavy Stuff
-   ledPadStripe.show(); // Update LEDs*/
-
-   /*for(int i = 0; i <= SW_CTRL.ctrlVal; i++){
-    ledPadStripe.setPixelColor(SW_ROW[i].ledPos, COL_ON.green, COL_ON.red, COL_ON.blue); // Heavy Stuff
-   }
-   for(int i = SW_CTRL.ctrlVal+1; i < 5; i++){
-    ledPadStripe.setPixelColor(SW_ROW[i].ledPos, COL_OFF.green, COL_OFF.red, COL_OFF.blue); // Heavy Stuff
-   }
-
-    ledPadStripe.show(); // Update LEDs*/
-    
-   /*for (int i = 0; i <= prevON; i++){    // Canvas SW ON
-    ledPadStripe.setPixelColor(SW_ROW[i].ledPos, COL_ON.green, COL_ON.red, COL_ON.blue); // Heavy Stuff
-   }*/
-   
-   if(prevON > SW_CTRL.ctrlVal){
+  if(prevON >= SW_CTRL.ctrlVal){
     int i = 0; //Start of the Sequence
-      for(int i = 0; i < (prevON - SW_CTRL.ctrlVal); i++){
-        for(int h = 0; h <= FS; h++){
-          ledPadStripe.setPixelColor(SW_ROW[prevON-i].ledPos, (COL_OFF.green - (((COL_OFF.green-COL_ON.green)/FS)*(FS-h))), (COL_OFF.red - (((COL_OFF.red-COL_ON.red)/FS)*(FS-h))), (COL_OFF.blue - (((COL_OFF.blue-COL_ON.blue)/FS)*(FS-h))));
-          ledPadStripe.setPixelColor(SW_ROW[prevON-i-1].ledPos, (COL_OFF.green - (((COL_OFF.green-COL_ON.green)/FS)*(h))), (COL_OFF.red - (((COL_OFF.red-COL_ON.red)/FS)*(h))), (COL_OFF.blue - (((COL_OFF.blue-COL_ON.blue)/FS)*(h))));
-          ledPadStripe.show(); // Update LEDs
-        }
+    for(int i = 0; i < (prevON - SW_CTRL.ctrlVal); i++){
+      for(int h = 0; h <= FS; h++){
+        ledPadStripe.setPixelColor(SW_ROW[prevON-i].ledPos, (COL_OFF.green - (((COL_OFF.green-COL_ON.green)/FS)*(FS-h))), (COL_OFF.red - (((COL_OFF.red-COL_ON.red)/FS)*(FS-h))), (COL_OFF.blue - (((COL_OFF.blue-COL_ON.blue)/FS)*(FS-h))));
+        ledPadStripe.setPixelColor(SW_ROW[prevON-i-1].ledPos, (COL_OFF.green - (((COL_OFF.green-COL_ON.green)/FS)*(h))), (COL_OFF.red - (((COL_OFF.red-COL_ON.red)/FS)*(h))), (COL_OFF.blue - (((COL_OFF.blue-COL_ON.blue)/FS)*(h))));
+        ledPadStripe.show(); // Update LEDs
+        delay(FD);
       }
-    }else{
-      for(int i = prevON; i < SW_CTRL.ctrlVal; i++){
-        for(int h = 0; h <= FS; h++){
-          //ledPadStripe.setPixelColor(SW_ROW[prevON-i].ledPos, (COL_OFF.green - (((COL_OFF.green-COL_ON.green)/FS)*(FS-h))), (COL_OFF.red - ((COL_ON.red/FS)*(FS-h))), (COL_OFF.blue - ((COL_ON.blue/FS)*(FS-h))));
-          ledPadStripe.setPixelColor(SW_ROW[i].ledPos, (COL_OFF.green - ((COL_ON.green/FS)*(h))), (COL_OFF.red - ((COL_ON.red/FS)*(h))), (COL_OFF.blue - ((COL_ON.blue/FS)*(h))));
-          ledPadStripe.show(); // Update LEDs
-        }
+    }
+  }else{
+    for(int i = prevON; i <= SW_CTRL.ctrlVal; i++){
+      for(int h = 0; h < FS; h++){
+        ledPadStripe.setPixelColor(SW_ROW[i].ledPos, (COL_OFF.green - (((COL_OFF.green-COL_ON.green)/FS)*(h+1))), (COL_OFF.red - (((COL_OFF.red-COL_ON.red)/FS)*(h+1))), (COL_OFF.blue - (((COL_OFF.blue-COL_ON.blue)/FS)*(h+1))));
+        ledPadStripe.show(); // Update LEDs
+        delay(FD);
       }
-    }     
+    }
+  }     
 }
 
 void SW_Action(int SW_ACTION, int SW_VAR){ }
@@ -507,9 +464,8 @@ void SW_PANIC_Read(int INIT_SW, int R_ON, int G_ON, int B_ON, int R_OFF, int G_O
 
 // PZ_Pad Read Function
 
-void PZ_PAD_Read() {
-  int PZRead = 0;
-  for (int i = 0; i < PZ_Q; i++) {
+
+/*   
     SET_MUXGATE(PZ_ROW[i].muxPos);
     delay(MUX_SETUP_DELAY);
     PZRead = analogRead(PZ_ROW[i].muxID);
@@ -537,58 +493,154 @@ void PZ_PAD_Read() {
       }
     }
   }
-}
-
-void PZ_PAD_Read_Single(int PZ){
-  int arrayLn = 100;
-  int PZArrayAvg = 0;
-  SET_MUXGATE(PZ_ROW[PZ].muxPos);
-  delay(MUX_SETUP_DELAY);
-  //int PZArray[arrayLn];
-  for (int i = 0; i < arrayLn; i++){
-    //PZArray[i] = analogRead(PZ_ROW[PZ].muxID);
-    PZArrayAvg += analogRead(PZ_ROW[PZ].muxID);
-    //Serial.println(PZArray[i]);
-  }
-  
-    //for (int i = 0; i < arrayLn; i++){
-    //  PZArrayAvg += PZArray[i];
-    //}
-  PZArrayAvg = (PZArrayAvg / arrayLn);
-  Serial.println(PZArrayAvg);
-}
-
-/*void SW_LED_update() {
-  if (ledEvent) {           // Execute only under demand
-    ledEvent = 0;
-    
-    //SW_PAD_MODE control
-    for (int i = SW_MODE_LED_INIT; i < (SW_MODE_LED_INIT + SW_MODE_Q); i++) {
-      ledPadStripe.setPixelColor(i, SW_MODE_LED[1][1], SW_MODE_LED[1][0], SW_MODE_LED[1][2]);   // Heavy Stuff
-    }
-    ledPadStripe.setPixelColor(SW_MODE_LED_INIT + SW_MODE, SW_MODE_LED[0][1], SW_MODE_LED[0][0], SW_MODE_LED[0][2]); // Heavy Stuff
-    
-    //SW_PAD_INSTR control
-    for (int i = SW_INSTR_LED_INIT; i < (SW_INSTR_LED_INIT + SW_INSTR_Q); i++) {
-      ledPadStripe.setPixelColor(i, SW_INSTR_LED[1][1], SW_INSTR_LED[1][0], SW_INSTR_LED[1][2]);   // Heavy Stuff
-    }
-    ledPadStripe.setPixelColor((SW_INSTR_LED_INIT + SW_INSTR), SW_INSTR_LED[0][1], SW_INSTR_LED[0][0], SW_INSTR_LED[0][2]); // Heavy Stuff
-    
-    //SW_PAD_SCALE control
-    for (int i = SW_SCALE_LED_INIT; i < (SW_SCALE_LED_INIT + SW_SCALE_Q); i++) {
-      ledPadStripe.setPixelColor(i, SW_SCALE_LED[1][1], SW_SCALE_LED[1][0], SW_SCALE_LED[1][2]);   // Heavy Stuff
-    }
-    ledPadStripe.setPixelColor(SW_SCALE_LED_INIT + SW_SCALE, SW_MODE_LED[0][1], SW_SCALE_LED[0][0], SW_SCALE_LED[0][2]); // Heavy Stuff
-    
-    //SW_BIG BUTTONS control
-    
-  }
-  delay(1);
-  ledPadStripe.show(); // Update LEDs
 }*/
 
 
+void PZ_PAD_Read(){
+    for (int i = 0; i < PZ_Q; i++){
+      PZ_ROW[i] = PZ_PAD_Read_Single(PZ_ROW[i]);  
+      PZ_ROW[i].pzLastMax = PZ_PAD_Trigger(PZ_ROW[i], PZ_PAD_Calculate_RMS(PZ_ROW[i]));
+    }
+}
 
+PZPAD PZ_PAD_Read_Single(PZPAD PZ_Pad){
+  SET_MUXGATE(PZ_Pad.muxPos);
+  delay(MUX_SETUP_DELAY);
+  for (int i = 0; i < PZ_MEASURE_CYCLE; i++){
+    PZ_Pad.pzVal[i] = analogRead(PZ_Pad.muxID);  
+    delay(1);
+  }
+  /*for (int i = 0; i < PZ_MEASURE_CYCLE; i++){
+      PZ_Pad.pzLastMax = PZ_PAD_Trigger(PZ_Pad, PZ_Pad.pzVal[i]);
+    delay(1);
+  }*/
+  return PZ_Pad;
+}
+
+int PZ_PAD_Calculate_RMS(PZPAD PZ_Pad){
+  int PZ_RMS = 0;
+  for (int i = 0; i < PZ_MEASURE_CYCLE; i++){
+    PZ_RMS = PZ_RMS + PZ_Pad.pzVal[i]^2;
+  }
+  return sqrt((double)(PZ_RMS / PZ_MEASURE_CYCLE));
+}
+
+int PZ_PAD_Trigger(PZPAD PZ_Pad, int newVal){
+  if((abs(newVal - PZ_Pad.pzLastMax)) > PZ_Pad.pzThr){
+    Serial.print(PZ_Pad.pzID);  Serial.print(" PZ Trigger with value; "); Serial.print((newVal - PZ_Pad.pzLastMax)); Serial.print(" THR: "); Serial.println(PZ_Pad.pzThr);
+  }    
+  return newVal;
+}
+
+void PZ_PAD_Autocalibration(){
+  int PZ_PAD_Cal[PZ_Q][PZ_AUTOCAL_CYCLES];
+  for (int h = 0; h < PZ_AUTOCAL_CYCLES; h++){
+    for (int i = 0; i < PZ_Q; i++){
+      PZ_ROW[i] = PZ_PAD_Read_Single(PZ_ROW[i]);  
+      PZ_PAD_Cal[i][h] = (abs(PZ_ROW[i].pzVal[i] - PZ_ROW[i].pzLastMax));    
+      PZ_ROW[i].pzLastMax = PZ_ROW[i].pzVal[i];
+    }
+  }
+
+  for (int i = 0; i < PZ_Q; i++){
+    int PZ_AVG = 0;
+    for (int h = 0; h < PZ_AUTOCAL_CYCLES; h++){
+      PZ_AVG += PZ_PAD_Cal[i][h];
+    }
+    PZ_ROW[i].pzThr = (PZ_AVG/PZ_AUTOCAL_CYCLES) + PZ_GEN_THR;
+  } 
+}
+
+void  SW_LED_Initialization_End(void){
+  /*for (int i = 0; i < 120; i++){    // Canvas SW OFF
+    ledPadStripe.setPixelColor(SWE.ledPos, (i*2), (i*2), (i*2)); // Heavy Stuffç
+    ledPadStripe.setPixelColor(SWF.ledPos, (i*2), (i*2), (i*2)); // Heavy Stuffç
+    ledPadStripe.show(); // Update LEDs
+    delay(10);
+  }*/
+  for (int h = 0; h < 5; h++){
+    for (int i = 0; i < 120; i++){
+      ledPadStripe.setPixelColor(SW_ROW_A[h].ledPos, (i*2), (i*2), (i*2)); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_B[h].ledPos, (i*2), (i*2), (i*2)); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_C[h].ledPos, (i*2), (i*2), (i*2)); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_D[h].ledPos, (i*2), (i*2), (i*2)); // Heavy Stuff
+      ledPadStripe.show(); // Update LEDs
+      delay(2);
+    }
+  }
+
+  SW_LED_ColumnFade(SW_ROW_D, SW_MODE, 0, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+  SW_LED_ColumnFade(SW_ROW_C, SW_INSTR, 0,INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+  SW_LED_ColumnFade(SW_ROW_B, SW_OCTV, 0,OCTV_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+  SW_LED_ColumnFade(SW_ROW_A, SW_SCALE, 0,SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+
+}
+
+void  SW_LED_Initialization_Start(void){
+
+  for (int h = 0; h < 5; h++){
+    for (int i = 0; i < 120; i++){
+      ledPadStripe.setPixelColor(SW_ROW_A[4-h].ledPos, (i*2), 0, 0); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_B[4-h].ledPos, (i*2), 0, 0); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_C[4-h].ledPos, (i*2), 0, 0); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_D[4-h].ledPos, (i*2), 0, 0); // Heavy Stuff
+      ledPadStripe.show(); // Update LEDs
+      delay(1);
+    }
+  }
+
+  for (int i = 0; i < 120; i++){    // Canvas SW OFF
+    ledPadStripe.setPixelColor(SWE.ledPos, (i*2), 0, 0); // Heavy Stuffç
+    ledPadStripe.setPixelColor(SWF.ledPos, (i*2), 0, 0); // Heavy Stuffç
+    ledPadStripe.show(); // Update LEDs
+    delay(5);
+  }
+
+  for (int h = 0; h < 5; h++){
+    for (int i = 0; i < 120; i++){
+      ledPadStripe.setPixelColor(SW_ROW_A[4-h].ledPos, 0, (i*2), 0); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_B[4-h].ledPos, 0, (i*2), 0); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_C[4-h].ledPos, 0, (i*2), 0); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_D[4-h].ledPos, 0, (i*2), 0); // Heavy Stuff
+      ledPadStripe.show(); // Update LEDs
+      delay(1);
+    }
+  }
+
+  for (int i = 0; i < 120; i++){    // Canvas SW OFF
+    ledPadStripe.setPixelColor(SWE.ledPos, 0, (i*2), 0); // Heavy Stuffç
+    ledPadStripe.setPixelColor(SWF.ledPos, 0, (i*2), 0); // Heavy Stuffç
+    ledPadStripe.show(); // Update LEDs
+    delay(5);
+  }
+  
+  for (int h = 0; h < 5; h++){
+    for (int i = 0; i < 120; i++){
+      ledPadStripe.setPixelColor(SW_ROW_A[4-h].ledPos, 0, 0, (i*2)); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_B[4-h].ledPos, 0, 0, (i*2)); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_C[4-h].ledPos, 0, 0, (i*2)); // Heavy Stuff
+      ledPadStripe.setPixelColor(SW_ROW_D[4-h].ledPos, 0, 0, (i*2)); // Heavy Stuff
+      ledPadStripe.show(); // Update LEDs
+      delay(1);
+    }
+  }
+
+  for (int i = 0; i < 120; i++){    // Canvas SW OFF
+    ledPadStripe.setPixelColor(SWE.ledPos, 0, 0, (i*2)); // Heavy Stuffç
+    ledPadStripe.setPixelColor(SWF.ledPos, 0, 0, (i*2)); // Heavy Stuffç
+    ledPadStripe.show(); // Update LEDs
+    delay(5);
+  }
+
+  
+  for (int i = 0; i < 120; i++){    // Canvas SW OFF
+    ledPadStripe.setPixelColor(SWE.ledPos, (i*2), (i*2), (i*2)); // Heavy Stuffç
+    ledPadStripe.setPixelColor(SWF.ledPos, (i*2), (i*2), (i*2)); // Heavy Stuffç
+    ledPadStripe.show(); // Update LEDs
+    delay(10);
+  }
+
+}
 
 void SW_LED_FadeSingle(int INIT_LED, int R_ON, int G_ON, int B_ON, int R_OFF, int G_OFF, int B_OFF, int fadeSteps, int fadeDelay){
     for(int h = 0; h < (fadeSteps+1); h++){ // Fade to ON
@@ -607,25 +659,6 @@ void SW_LED_FadeSingle(int INIT_LED, int R_ON, int G_ON, int B_ON, int R_OFF, in
       ledPadStripe.show(); // Update LEDs
     }
 }
-
-/*void SW_LED_FadeGlobal(int INIT_R, int INIT_G, int INIT_B, int END_R, int END_G, int END_B, int fadeSteps, int fadeDelay){
-  bool dir_R, dir_G, dir_B;
-  int  step_R, step_G, step_B;
-  int  Red, Grn, Blu;
-  if(INIT_R >= END_R){dir_R = 0; step_R = ((INIT_R-END_R)/fadeSteps);}else{dir_R = 1; step_R = ((END_R-INIT_R)/fadeSteps);};
-  if(INIT_G >= END_G){dir_G = 0; step_G = ((INIT_G-END_G)/fadeSteps);}else{dir_G = 1; step_G = ((END_G-INIT_G)/fadeSteps);};
-  if(INIT_B >= END_B){dir_B = 0; step_R = ((INIT_B-END_B)/fadeSteps);}else{dir_B = 1; step_B = ((END_B-INIT_B)/fadeSteps);};
-  for(int h = 0; h < fadeSteps; h++){
-    if(dir_R){Red = (INIT_R + (h* step_R));}else{Red = (INIT_R - (h* step_R));};
-    if(dir_G){Grn = (INIT_G + (h* step_G));}else{Grn = (INIT_G - (h* step_G));};
-    if(dir_B){Blu = (INIT_B + (h* step_B));}else{Blu = (INIT_B - (h* step_B));};
-    for(int i = 0; i< (SW_SCALE_Q + SW_MODE_Q + SW_INSTR_Q + 3); i++){
-      ledPadStripe.setPixelColor(i, Red, Grn, Blu);   // Heavy Stuff
-    }
-    delay(fadeDelay);
-    ledPadStripe.show(); // Update LEDs
-  }
-}*/
 
 void MIDI_TX(byte MIDICHANNEL, byte MESSAGE, byte PITCH, byte VELOCITY) {
   //byte status1 = MESSAGE + MIDICHANNEL;
