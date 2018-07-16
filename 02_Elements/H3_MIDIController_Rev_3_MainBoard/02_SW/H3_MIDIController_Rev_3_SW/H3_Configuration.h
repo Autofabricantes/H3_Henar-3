@@ -76,22 +76,23 @@ const int MAX_MIDI_VEL        = 127;
 const int SW_ITE              =   0;
 const int SW_ITE_MAX          =   5;
 const int SW_Q                =  22;
-const int SW_THR              = 512; // Switch Threshold (Fake Digital)
-int   MENU_MODE               =   0; // Menu Mode Flag (Values 0, 1)
+const int SW_THR              = 800; // Switch Threshold (Fake Digital)
+const int MAX_MENU            =   3; // Menu Mode Flag (Values 0, 1)
 const int FADESTEPS_C         =   6; // GENERAL FadeSteps
 const int FADEDELAY_C         =  10; // GENERAL FadeDelay
 const int MUX_SETUP_DELAY     =   7; // Mux Delay for PZPad
 const int PZ_MEASURE_CYCLE    =   3;
 const int PZ_AUTOCAL_CYCLES   =  30;
-const int PZ_GEN_THR          =   2;
+const int PZ_GEN_THR          =   3;
 const int PZ_Q                =   7;     // Piezo Quantity
 const int PZ_RLX              =   5;     // Piezo Relax Time (ms)
+const int NOTE_DURATION       = 100;
 
 const int MODE                =   0;  
 const int INSTR               =   1;  
 const int SCALE               =   2;  
 const int SEQ                 =   3;  
-const int EFC                 =   4;
+const int EFCT                =   4;
 const int MODU                =   5;
 const int OCTV                =   6;
 const int VOL                 =   7;
@@ -219,15 +220,16 @@ SWCTRL SW_PANIC = {PANIC, 0};
 SWCTRL SW_MENU  = {MENU,  0};
 
 // Control Arrays for SW_Pad Mapping
-SWPAD SW_ROW_A[5] = {SWA0, SWA1, SWA2, SWA3, SWA4};
-SWPAD SW_ROW_B[5] = {SWB0, SWB1, SWB2, SWB3, SWB4};
-SWPAD SW_ROW_C[5] = {SWC0, SWC1, SWC2, SWC3, SWC4};
-SWPAD SW_ROW_D[5] = {SWD0, SWD1, SWD2, SWD3, SWD4};
+SWPAD SW_ROW_A[5]   = {SWA0, SWA1, SWA2, SWA3, SWA4};
+SWPAD SW_ROW_B[5]   = {SWB0, SWB1, SWB2, SWB3, SWB4};
+SWPAD SW_ROW_C[5]   = {SWC0, SWC1, SWC2, SWC3, SWC4};
+SWPAD SW_ROW_D[5]   = {SWD0, SWD1, SWD2, SWD3, SWD4};
 SWPAD SW_ROW_CD[10] = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD0, SWD1, SWD2, SWD3, SWD4}; 
-SWPAD SW_ROW_E[1]  = {SWE};
-SWPAD SW_ROW_F[1]  = {SWF};
-PZPAD PZ_ROW[7] = {PZA, PZB, PZC, PZD, PZE, PZF, PZG};
-SWCTRL CONFIG[10] = {SW_MODE, SW_INSTR, SW_SCALE, SW_SEQ, SW_EFCT, SW_MODU, SW_OCTV, SW_VOL, SW_PANIC, SW_MENU}
+SWPAD SW_ROW_E[1]   = {SWE};
+SWPAD SW_ROW_F[1]   = {SWF};
+PZPAD PZ_ROW[PZ_Q]  = {PZA, PZB, PZC, PZD, PZE, PZF, PZG};
+SWCTRL CONFIG[8]    = {SW_MODE, SW_INSTR, SW_SCALE, SW_SEQ, SW_EFCT, SW_MODU, SW_OCTV, SW_VOL};
+int Menu            = 0;
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // -----------------------------------------------------Control Arrays for PZ PAD-----------------------------------------------------------
