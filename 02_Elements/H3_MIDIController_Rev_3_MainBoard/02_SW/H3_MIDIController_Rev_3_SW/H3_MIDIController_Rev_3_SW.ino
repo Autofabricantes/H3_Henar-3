@@ -31,12 +31,12 @@ void setup() {
   pinMode(MUX_D, OUTPUT);
 
   SW_LED_Initialization_Start(GEN_OFF);
-  PZ_PAD_Autocalibration();
+  //PZ_PAD_Autocalibration();
   SW_LED_Initialization_End();
 }
 
 void loop() {
-    if(ITER == 4){
+    //if(ITER == 4){
       ITER = 0;
       SW_MODE.Val = readSW_ROW(SW_ROW_CD, (sizeof(SW_ROW_CD)/sizeof(SWPAD)), SW_MODE, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
       //SW_INSTR.Val = readSW_ROW(SW_ROW_C, SW_INSTR, INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
@@ -44,8 +44,8 @@ void loop() {
       SW_SCALE.Val = readSW_ROW(SW_ROW_A, (sizeof(SW_ROW_A)/sizeof(SWPAD)), SW_SCALE, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
       SWE = readSW_Single(SWE, PANIC_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
       SWF = readSW_Single(SWF, MENU_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-    }
-    ITER++;
+    //}
+    //ITER++;
     //PZ_PAD_Read();
 
     //Serial << (sizeof(SW_ROW_CD)/sizeof(SWPAD)) << endl;
@@ -62,6 +62,7 @@ int readSW_ROW(SWPAD SW_ROW[], int arraySize, SWCTRL SW_CTRL, LEDCOL COL_ON, LED
           SW_ROW[i].swAct = ON;                   // Set SW_Pad as ON
           CONFIG[SW_CTRL.ID].Val = SW_CTRL.Val;
 #ifdef SERIAL_DEBUG 
+          
           Serial << "CTRL: " << SW_CTRL.ID << " Val: " << CONFIG[SW_CTRL.ID].Val << " MUX GATE: " << SW_ROW[i].muxPos << " LED: " << SW_ROW[i].ledPos << " PAD: " << i << endl;
 #else
           MIDI_TX(CONFIG[INSTR].Val, NOTE_ON, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][0]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 127);
@@ -141,69 +142,35 @@ void SW_PANIC_Read(int INIT_SW, int R_ON, int G_ON, int B_ON, int R_OFF, int G_O
    }    // Set SW_Pad as OFF 
 }*/
 
+
 // PZ_Pad Read Function
 
-void PZ_PAD_Read(){
-    for (int i = 0; i < (sizeof(PZ_ROW)/sizeof(PZPAD)); i++){
-      PZ_ROW[i] = PZ_PAD_Read_Single(PZ_ROW[i]);  
-      PZ_ROW[i].pzLastMax = PZ_PAD_Trigger(PZ_ROW[i], PZ_PAD_Calculate_RMS(PZ_ROW[i]));
-    }
-}
-
-PZPAD PZ_PAD_Read_Single(PZPAD PZ_Pad){
-  SET_MUXGATE(PZ_Pad.muxPos);
-  delay(MUX_SETUP_DELAY);
-  for (int i = 0; i < PZ_MEASURE_CYCLE; i++){
-    PZ_Pad.pzVal[i] = analogRead(PZ_Pad.muxID);  
-    delay(1);
-  }
-  /*for (int i = 0; i < PZ_MEASURE_CYCLE; i++){
-      PZ_Pad.pzLastMax = PZ_PAD_Trigger(PZ_Pad, PZ_Pad.pzVal[i]);
-    delay(1);
-  }*/
-  return PZ_Pad;
-}
-
-int PZ_PAD_Calculate_RMS(PZPAD PZ_Pad){
-  int PZ_RMS = 0;
-  for (int i = 0; i < PZ_MEASURE_CYCLE; i++){
-    PZ_RMS = PZ_RMS + PZ_Pad.pzVal[i]^2;
-  }
-  return sqrt((double)(PZ_RMS / PZ_MEASURE_CYCLE));
-}
-
-int PZ_PAD_Trigger(PZPAD PZ_Pad, int newVal){
-  if((abs(newVal - PZ_Pad.pzLastMax)) > PZ_Pad.pzThr){
+void SWPZ_Read(SWPAD SW_ROW[], int arraySize, LEDCOL COL_ON, LEDCOL COL_OFF, int fadeSteps, int fadeDelay){
+  for(int i = 0; i < arraySize; i++){ 
+     SET_MUXGATE(SW_ROW[i].muxPos);
+     if (analogRead(SW_ROW[i].muxID) < SW_THR){    // If SW Pad activated // TODO Change to digitalRead()
+       if (!SW_ROW[i].swAct){                      // if SW Pad not previously activated
+          SW_LED_FadeSingle(SW_ROW[i], COL_ON, COL_OFF,  fadeSteps, fadeDelay); // Update LED 
+          SW_ROW[i].swAct = ON;                   // Set SW_Pad as ON
 #ifdef SERIAL_DEBUG 
-    Serial << "PZ_PAD ID: " << PZ_Pad.pzID << " PZ Trigger with value; " << (newVal - PZ_Pad.pzLastMax) << " THR: " << PZ_Pad.pzThr << endl;
-#else
-    MIDI_TX(CONFIG[INSTR].Val, NOTE_ON, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][PZ_Pad.pzID]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 127);
-    delay(NOTE_DURATION);
-    MIDI_TX(CONFIG[INSTR].Val, NOTE_OFF, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][PZ_Pad.pzID]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 0);
+          Serial << "SWPZPAD: " << " MUX GATE: " << SW_ROW[i].muxPos << " LED: " << SW_ROW[i].ledPos << " PAD: " << i << endl;
+#else     // TODO Change duration triggered on DigitalRead = 0
+          MIDI_TX(CONFIG[INSTR].Val, NOTE_ON, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][i]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 127);
+          delay(NOTE_DURATION);
+          MIDI_TX(CONFIG[INSTR].Val, NOTE_OFF, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][i]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 0);
 #endif
-    return PZ_Pad.pzLastMax; // PZ Relax
-  }    
-  return newVal;
-}
-
-void PZ_PAD_Autocalibration(){
-  int PZ_PAD_Cal[PZ_Q][PZ_AUTOCAL_CYCLES];
-  for (int h = 0; h < PZ_AUTOCAL_CYCLES; h++){
-    for (int i = 0; i < PZ_Q; i++){
-      PZ_ROW[i] = PZ_PAD_Read_Single(PZ_ROW[i]);  
-      PZ_PAD_Cal[i][h] = (abs(PZ_ROW[i].pzVal[i] - PZ_ROW[i].pzLastMax));    
-      PZ_ROW[i].pzLastMax = PZ_ROW[i].pzVal[i];
-    }
+        }
+     }else{
+       if (SW_ROW[i].swAct){                      // if SW Pad previously activated
+         SW_ROW[i].swAct = OFF;                   // Set SW_Pad as ON
+       }
+     }
   }
-
-  for (int i = 0; i < PZ_Q; i++){
-    int PZ_AVG = 0;
-    for (int h = 0; h < PZ_AUTOCAL_CYCLES; h++){
-      PZ_AVG += PZ_PAD_Cal[i][h];
-    }
-    PZ_ROW[i].pzThr = (PZ_AVG/PZ_AUTOCAL_CYCLES) + PZ_GEN_THR;
-  } 
+  return 0;
 }
+
+
+
 
 void SW_LED_ColumnFade(SWPAD SW_ROW[], SWCTRL SW_CTRL, int prevON, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){
   int RDiff = (COL_OFF.red-COL_ON.red);

@@ -71,7 +71,7 @@ const int MUX_2               =   2;
 // Constant Values Definition
 const bool ON                 =   1;         // General ON value
 const bool OFF                =   0;         // General OFF value
-const int muxSel[4]           =   {6, 5, 4, 3}; // MUX Selector Pins MUX_D, MUX_C, MUX_B, MUX_A
+const int muxSel[4]           =   {MUX_D, MUX_C, MUX_B, MUX_A}; // MUX Selector Pins MUX_D, MUX_C, MUX_B, MUX_A
 const int MAX_MIDI_VEL        = 127;
 const int SW_ITE              =   0;
 const int SW_ITE_MAX          =   5;
@@ -190,6 +190,16 @@ SWPAD SWD4 = {1,2,0,MUX_0};
 SWPAD SWE  = {11,11,0,MUX_0};
 SWPAD SWF  = {10,10,0,MUX_0};
 
+// Completar con los valores concretos
+SWPAD SWPZA = {9,9,0,MUX_0};
+SWPAD SWPZB = {9,9,0,MUX_0};
+SWPAD SWPZC = {9,9,0,MUX_0};
+SWPAD SWPZD = {9,9,0,MUX_0};
+SWPAD SWPZE = {9,9,0,MUX_0};
+SWPAD SWPZF = {9,9,0,MUX_0};
+SWPAD SWPZG = {9,9,0,MUX_0};
+
+
 // Control Arrays for SW_Pad LEDS
 // ---------------------------------------------------------------------------------------------------------------------
 // [0:255]          RED    || GREEN || BLUE     || Comments
@@ -228,6 +238,7 @@ SWPAD SW_ROW_CD[10] = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD0, SWD1, SWD2, SWD3, SWD
 SWPAD SW_ROW_E[1]   = {SWE};
 SWPAD SW_ROW_F[1]   = {SWF};
 PZPAD PZ_ROW[PZ_Q]  = {PZA, PZB, PZC, PZD, PZE, PZF, PZG};
+SWPAD SWPZ_ROW[PZ_Q]   = {SWPZA, SWPZB, SWPZC, SWPZD, SWPZE, SWPZF, SWPZG};
 SWCTRL CONFIG[8]    = {SW_MODE, SW_INSTR, SW_SCALE, SW_SEQ, SW_EFCT, SW_MODU, SW_OCTV, SW_VOL};
 int Menu            = 0;
 
