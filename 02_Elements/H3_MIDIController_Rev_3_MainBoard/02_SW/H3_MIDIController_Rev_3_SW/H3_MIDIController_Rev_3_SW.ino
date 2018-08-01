@@ -11,7 +11,7 @@
 #include "H3_Configuration.h"
 
 
-# define SERIAL_DEBUG
+//# define SERIAL_DEBUG
 //# define SERIAL_DEBUG_PZ
 //# define SERIAL_DEBUG_PZ_FULL
 
@@ -30,13 +30,20 @@ void setup() {
   pinMode(MUX_C, OUTPUT);
   pinMode(MUX_D, OUTPUT);
 
-  SW_LED_Initialization_Start(GEN_OFF);
+  //SW_LED_Initialization_Start(GEN_OFF);
   //PZ_PAD_Autocalibration();
   SW_LED_Initialization_End();
+
+  /*for (int h = 0; h < PZ_Q; h++){
+      ledPadStripe.setPixelColor(SWPZ_ROW[h].ledPos,255, 255, 255); // Heavy Stuff
+     ledPadStripe.show(); // Update LEDs
+      delay(1000);
+  }*/
+  
 }
 
 void loop() {
-    //if(ITER == 4){
+    if(ITER == 2){
       ITER = 0;
       SW_MODE.Val = readSW_ROW(SW_ROW_CD, (sizeof(SW_ROW_CD)/sizeof(SWPAD)), SW_MODE, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
       //SW_INSTR.Val = readSW_ROW(SW_ROW_C, SW_INSTR, INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
@@ -44,9 +51,10 @@ void loop() {
       SW_SCALE.Val = readSW_ROW(SW_ROW_A, (sizeof(SW_ROW_A)/sizeof(SWPAD)), SW_SCALE, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
       SWE = readSW_Single(SWE, PANIC_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
       SWF = readSW_Single(SWF, MENU_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-    //}
-    //ITER++;
-    //PZ_PAD_Read();
+    
+    }
+    ITER++;
+    SWPZ_Read(SWPZ_ROW, PZ_Q, INSTR_0, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
 
     //Serial << (sizeof(SW_ROW_CD)/sizeof(SWPAD)) << endl;
 }
@@ -62,8 +70,8 @@ int readSW_ROW(SWPAD SW_ROW[], int arraySize, SWCTRL SW_CTRL, LEDCOL COL_ON, LED
           SW_ROW[i].swAct = ON;                   // Set SW_Pad as ON
           CONFIG[SW_CTRL.ID].Val = SW_CTRL.Val;
 #ifdef SERIAL_DEBUG 
-          
-          Serial << "CTRL: " << SW_CTRL.ID << " Val: " << CONFIG[SW_CTRL.ID].Val << " MUX GATE: " << SW_ROW[i].muxPos << " LED: " << SW_ROW[i].ledPos << " PAD: " << i << endl;
+          Serial << "SWPAD ON: " << SW_ROW[i].swID << " MUX GATE: " << SW_ROW[i].muxPos << " LED: " << SW_ROW[i].ledPos << " PAD: " << i << endl;
+          Serial << "CTRL: " << SW_CTRL.ID << " Val: " << CONFIG[SW_CTRL.ID].Val << endl;
 #else
           MIDI_TX(CONFIG[INSTR].Val, NOTE_ON, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][0]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 127);
           delay(NOTE_DURATION);
@@ -83,10 +91,10 @@ SWPAD readSW_Single(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int fadeSteps, 
   SET_MUXGATE(SW_Pad.muxPos);
   if (analogRead(SW_Pad.muxID) < SW_THR){    // If SW Pad activated // TODO Change to digitalRead()
    if (!SW_Pad.swAct){                      // if SW Pad not previously activated
-      SW_LED_FadeSingle(SW_Pad, COL_ON, COL_OFF,  FADESTEPS_C, FADEDELAY_C); // Update LED Stripe
+      SW_LED_FadeSingle_FULL(SW_Pad, COL_ON, COL_OFF,  FADESTEPS_C, FADEDELAY_C); // Update LED Stripe
       SW_Pad.swAct = ON;                   // Set SW_Pad as ON
 #ifdef SERIAL_DEBUG 
-      Serial << " MUX GATE: " << SW_Pad.muxPos << " LED: " << SW_Pad.ledPos << endl;
+      Serial << "SWPAD ON: " << SW_ROW[i].swID << " MUX GATE: " << SW_Pad.muxPos << " LED: " << SW_Pad.ledPos << endl;
 #else
       MIDI_TX(CONFIG[INSTR].Val, NOTE_ON, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][0]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 127);
       delay(NOTE_DURATION);
@@ -149,20 +157,24 @@ void SWPZ_Read(SWPAD SW_ROW[], int arraySize, LEDCOL COL_ON, LEDCOL COL_OFF, int
   for(int i = 0; i < arraySize; i++){ 
      SET_MUXGATE(SW_ROW[i].muxPos);
      if (analogRead(SW_ROW[i].muxID) < SW_THR){    // If SW Pad activated // TODO Change to digitalRead()
-       if (!SW_ROW[i].swAct){                      // if SW Pad not previously activated
-          SW_LED_FadeSingle(SW_ROW[i], COL_ON, COL_OFF,  fadeSteps, fadeDelay); // Update LED 
+       if (!SW_ROW[i].swAct){                      // if SW Pad not previously activated       
           SW_ROW[i].swAct = ON;                   // Set SW_Pad as ON
 #ifdef SERIAL_DEBUG 
-          Serial << "SWPZPAD: " << " MUX GATE: " << SW_ROW[i].muxPos << " LED: " << SW_ROW[i].ledPos << " PAD: " << i << endl;
-#else     // TODO Change duration triggered on DigitalRead = 0
+          Serial << "SWPZPAD ON: " << SW_ROW[i].swID << " MUX GATE: " << SW_ROW[i].muxPos << " LED: " << SW_ROW[i].ledPos << " PAD: " << i << endl;
+#else
           MIDI_TX(CONFIG[INSTR].Val, NOTE_ON, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][i]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 127);
-          delay(NOTE_DURATION);
-          MIDI_TX(CONFIG[INSTR].Val, NOTE_OFF, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][i]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 0);
-#endif
+#endif    
+          SW_LED_FadeSingle_UP(SW_ROW[i], COL_ON, COL_OFF,  fadeSteps, fadeDelay); // Update LED 
         }
      }else{
        if (SW_ROW[i].swAct){                      // if SW Pad previously activated
          SW_ROW[i].swAct = OFF;                   // Set SW_Pad as ON
+#ifdef SERIAL_DEBUG 
+          Serial << "SWPZPAD OFF: " << SW_ROW[i].swID << " MUX GATE: " << SW_ROW[i].muxPos << " LED: " << SW_ROW[i].ledPos << " PAD: " << i << endl;
+#else
+         MIDI_TX(CONFIG[INSTR].Val, NOTE_OFF, (PZ_MIDI_BYTE_2[CONFIG[SCALE].Val][i]+CONFIG[MODE].Val+(12*CONFIG[OCTV].Val)), 0);
+#endif  
+         SW_LED_FadeSingle_DW(SW_ROW[i], COL_ON, COL_OFF,  fadeSteps, fadeDelay); // Update LED 
        }
      }
   }
@@ -197,7 +209,7 @@ void SW_LED_ColumnFade(SWPAD SW_ROW[], SWCTRL SW_CTRL, int prevON, LEDCOL COL_ON
   }     
 }
 
-void SW_LED_FadeSingle(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){
+void SW_LED_FadeSingle_FULL(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){
     int RDiff = (COL_OFF.red-COL_ON.red);
     int GDiff = (COL_OFF.green-COL_ON.green);
     int BDiff = (COL_OFF.blue-COL_ON.blue);
@@ -207,6 +219,28 @@ void SW_LED_FadeSingle(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int 
       delay(FD);
     }
     delay(5*FD);
+    for(int h = 0; h < (FS); h++){ // Fade to OFF
+      ledPadStripe.setPixelColor(SW_Pad.ledPos, (COL_OFF.green - ((GDiff/FS)*(FS-h))), (COL_OFF.red - ((RDiff/FS)*(FS-h))), (COL_OFF.blue - ((BDiff/FS)*(FS-h))));
+      ledPadStripe.show(); // Update LEDs
+      delay(FD);
+    }
+}
+
+void SW_LED_FadeSingle_UP(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){
+    int RDiff = (COL_OFF.red-COL_ON.red);
+    int GDiff = (COL_OFF.green-COL_ON.green);
+    int BDiff = (COL_OFF.blue-COL_ON.blue);
+    for(int h = 0; h < (FS); h++){ // Fade to ON
+      ledPadStripe.setPixelColor(SW_Pad.ledPos, (COL_OFF.green - ((GDiff/FS)*(h))), (COL_OFF.red - ((RDiff/FS)*(h))), (COL_OFF.blue - ((BDiff/FS)*(h))));
+      ledPadStripe.show(); // Update LEDs
+      delay(FD);
+    }
+}
+
+void SW_LED_FadeSingle_DW(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){
+    int RDiff = (COL_OFF.red-COL_ON.red);
+    int GDiff = (COL_OFF.green-COL_ON.green);
+    int BDiff = (COL_OFF.blue-COL_ON.blue);
     for(int h = 0; h < (FS); h++){ // Fade to OFF
       ledPadStripe.setPixelColor(SW_Pad.ledPos, (COL_OFF.green - ((GDiff/FS)*(FS-h))), (COL_OFF.red - ((RDiff/FS)*(FS-h))), (COL_OFF.blue - ((BDiff/FS)*(FS-h))));
       ledPadStripe.show(); // Update LEDs
@@ -225,11 +259,6 @@ void  SW_LED_Initialization_End(void){
       delay(2);
     }
   }
-
-  SW_LED_ColumnFade(SW_ROW_D, SW_MODE, 0, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-  SW_LED_ColumnFade(SW_ROW_C, SW_INSTR, 0,INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-  SW_LED_ColumnFade(SW_ROW_B, SW_OCTV, 0,OCTV_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-  SW_LED_ColumnFade(SW_ROW_A, SW_SCALE, 0,SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
 
 }
 

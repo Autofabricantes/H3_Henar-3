@@ -75,7 +75,7 @@ const int muxSel[4]           =   {MUX_D, MUX_C, MUX_B, MUX_A}; // MUX Selector 
 const int MAX_MIDI_VEL        = 127;
 const int SW_ITE              =   0;
 const int SW_ITE_MAX          =   5;
-const int SW_Q                =  22;
+const int SW_Q                =  29;
 const int SW_THR              = 800; // Switch Threshold (Fake Digital)
 const int MAX_MENU            =   3; // Menu Mode Flag (Values 0, 1)
 const int FADESTEPS_C         =   6; // GENERAL FadeSteps
@@ -108,16 +108,7 @@ struct SWPAD{
   int   ledPos;
   bool  swAct;
   int   muxID;
-};
-
-struct PZPAD{
-  int   pzID;
-  int   muxPos;
-  int   pzThr;
-  bool  pzAct;
-  int   muxID;
-  int   pzVal[PZ_MEASURE_CYCLE];
-  int   pzLastMax;
+  char  swID;
 };
 
 struct LEDCOL{
@@ -155,49 +146,41 @@ const int GC[256] = {
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------Struct Object Definition--------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------
-PZPAD PZA = {0, 4, 15, 0, MUX_2};
-PZPAD PZB = {1, 5, 5, 0, MUX_2};
-PZPAD PZC = {2, 6, 5, 0, MUX_2};
-PZPAD PZD = {3, 3, 5, 0, MUX_2};
-PZPAD PZE = {4, 2, 5, 0, MUX_2};
-PZPAD PZF = {5, 1, 5, 0, MUX_2};
-PZPAD PZG = {6, 0, 5, 0, MUX_2};
+SWPAD SWA0 = {5 ,21,0,MUX_1,"SWA0"};
+SWPAD SWA1 = {12,25,0,MUX_1,"SWA1"};
+SWPAD SWA2 = {14,27,0,MUX_1,"SWA2"};
+SWPAD SWA3 = {0 ,16,0,MUX_1,"SWA3"}; 
+SWPAD SWA4 = {3 ,19,0,MUX_1,"SWA4"};
 
-SWPAD SWA0 = {5,17,0,MUX_1};
-SWPAD SWA1 = {10,18,0,MUX_1};
-SWPAD SWA2 = {12,20,0,MUX_1};
-SWPAD SWA3 = {0,12,0,MUX_1};
-SWPAD SWA4 = {3,15,0,MUX_1};
+SWPAD SWB0 = {4 ,20,0,MUX_1,"SWB0"};
+SWPAD SWB1 = {15,28,0,MUX_1,"SWB1"};
+SWPAD SWB2 = {13,26,0,MUX_1,"SWB2"};
+SWPAD SWB3 = {1 ,17,0,MUX_1,"SWB3"};  
+SWPAD SWB4 = {2 ,18,0,MUX_1,"SWB4"};
 
-SWPAD SWB0 = {4,16,0,MUX_1};
-SWPAD SWB1 = {13,21,0,MUX_1};
-SWPAD SWB2 = {11,19,0,MUX_1};
-SWPAD SWB3 = {1,13,0,MUX_1};
-SWPAD SWB4 = {2,14,0,MUX_1};
+SWPAD SWC0 = {8 ,8 ,0,MUX_0,"SWC0"};
+SWPAD SWC1 = {4 ,4 ,0,MUX_0,"SWC1"};
+SWPAD SWC2 = {7 ,7 ,0,MUX_0,"SWC2"};
+SWPAD SWC3 = {0 ,0 ,0,MUX_0,"SWC3"};
+SWPAD SWC4 = {3 ,3 ,0,MUX_0,"SWC4"};
 
-SWPAD SWC0 = {8,8,0,MUX_0};
-SWPAD SWC1 = {4,4,0,MUX_0};
-SWPAD SWC2 = {7,7,0,MUX_0};
-SWPAD SWC3 = {0,0,0,MUX_0};
-SWPAD SWC4 = {3,3,0,MUX_0};
+SWPAD SWD0 = {9 ,9 ,0,MUX_0,"SWD0"};
+SWPAD SWD1 = {5 ,5 ,0,MUX_0,"SWD1"};
+SWPAD SWD2 = {6 ,6 ,0,MUX_0,"SWD2"};
+SWPAD SWD3 = {2 ,1 ,0,MUX_0,"SWD3"};
+SWPAD SWD4 = {1 ,2 ,0,MUX_0,"SWD4"};
 
-SWPAD SWD0 = {9,9,0,MUX_0};
-SWPAD SWD1 = {5,5,0,MUX_0};
-SWPAD SWD2 = {6,6,0,MUX_0};
-SWPAD SWD3 = {2,1,0,MUX_0};
-SWPAD SWD4 = {1,2,0,MUX_0};
-
-SWPAD SWE  = {11,11,0,MUX_0};
-SWPAD SWF  = {10,10,0,MUX_0};
+SWPAD SWE  = {11,11,0,MUX_0,"SWE"};
+SWPAD SWF  = {12,12,0,MUX_0,"SWF"};
 
 // Completar con los valores concretos
-SWPAD SWPZA = {9,9,0,MUX_0};
-SWPAD SWPZB = {9,9,0,MUX_0};
-SWPAD SWPZC = {9,9,0,MUX_0};
-SWPAD SWPZD = {9,9,0,MUX_0};
-SWPAD SWPZE = {9,9,0,MUX_0};
-SWPAD SWPZF = {9,9,0,MUX_0};
-SWPAD SWPZG = {9,9,0,MUX_0};
+SWPAD SWPZA = {9 ,22,0,MUX_1, "SWPZA"};
+SWPAD SWPZB = {10,23,0,MUX_1, "SWPZB"};
+SWPAD SWPZC = {11,24,0,MUX_1, "SWPZC"};
+SWPAD SWPZD = {10,10,0,MUX_0, "SWPZD"};
+SWPAD SWPZE = {15,15,0,MUX_0, "SWPZE"};
+SWPAD SWPZF = {14,14,0,MUX_0, "SWPZF"};
+SWPAD SWPZG = {13,13,0,MUX_0, "SWPZG"};
 
 
 // Control Arrays for SW_Pad LEDS
@@ -218,6 +201,14 @@ LEDCOL PANIC_ON  = {GC[255], GC[0],    GC[0]};    // SW_MENU ON LED COLOR
 LEDCOL NUSE_ON   = {GC[0],   GC[255],  GC[0]};    // SW_MENU ON LED COLOR
 LEDCOL SEQ_ON    = {GC[0],   GC[255],  GC[100]};  // SW_SEQ ON LED COLOR
 
+LEDCOL INSTR_0   = {GC[72],    GC[252],  GC[36]};   // INSTR_0 ON LED COLOR
+LEDCOL INSTR_1   = {GC[36],    GC[216],  GC[72]};   // INSTR_1 ON LED COLOR
+LEDCOL INSTR_2   = {GC[108],   GC[180],  GC[108]};  // INSTR_2 ON LED COLOR
+LEDCOL INSTR_3   = {GC[252],   GC[144],  GC[144]};  // INSTR_3 ON LED COLOR
+LEDCOL INSTR_4   = {GC[216],   GC[108],  GC[180]};  // INSTR_4 ON LED COLOR
+LEDCOL INSTR_5   = {GC[180],   GC[72],   GC[216]};  // INSTR_5 ON LED COLOR
+LEDCOL INSTR_6   = {GC[144],   GC[36],   GC[252]};  // INSTR_6 ON LED COLOR
+
 SWCTRL SW_MODE  = {MODE,  0};  
 SWCTRL SW_INSTR = {INSTR, 1};  
 SWCTRL SW_SCALE = {SCALE, 0};  
@@ -230,16 +221,16 @@ SWCTRL SW_PANIC = {PANIC, 0};
 SWCTRL SW_MENU  = {MENU,  0};
 
 // Control Arrays for SW_Pad Mapping
-SWPAD SW_ROW_A[5]   = {SWA0, SWA1, SWA2, SWA3, SWA4};
-SWPAD SW_ROW_B[5]   = {SWB0, SWB1, SWB2, SWB3, SWB4};
-SWPAD SW_ROW_C[5]   = {SWC0, SWC1, SWC2, SWC3, SWC4};
-SWPAD SW_ROW_D[5]   = {SWD0, SWD1, SWD2, SWD3, SWD4};
-SWPAD SW_ROW_CD[10] = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD0, SWD1, SWD2, SWD3, SWD4}; 
-SWPAD SW_ROW_E[1]   = {SWE};
-SWPAD SW_ROW_F[1]   = {SWF};
-PZPAD PZ_ROW[PZ_Q]  = {PZA, PZB, PZC, PZD, PZE, PZF, PZG};
+LEDCOL INSTR_COL[PZ_Q] = {INSTR_0, INSTR_1, INSTR_2, INSTR_3, INSTR_4, INSTR_5, INSTR_6};
+SWPAD SW_ROW_A[5]      = {SWA0, SWA1, SWA2, SWA3, SWA4};
+SWPAD SW_ROW_B[5]      = {SWB0, SWB1, SWB2, SWB3, SWB4};
+SWPAD SW_ROW_C[5]      = {SWC0, SWC1, SWC2, SWC3, SWC4};
+SWPAD SW_ROW_D[5]      = {SWD0, SWD1, SWD2, SWD3, SWD4};
+SWPAD SW_ROW_CD[10]    = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD0, SWD1, SWD2, SWD3, SWD4}; 
+SWPAD SW_ROW_E[1]      = {SWE};
+SWPAD SW_ROW_F[1]      = {SWF};
 SWPAD SWPZ_ROW[PZ_Q]   = {SWPZA, SWPZB, SWPZC, SWPZD, SWPZE, SWPZF, SWPZG};
-SWCTRL CONFIG[8]    = {SW_MODE, SW_INSTR, SW_SCALE, SW_SEQ, SW_EFCT, SW_MODU, SW_OCTV, SW_VOL};
+SWCTRL CONFIG[8]       = {SW_MODE, SW_INSTR, SW_SCALE, SW_SEQ, SW_EFCT, SW_MODU, SW_OCTV, SW_VOL};
 int Menu            = 0;
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
