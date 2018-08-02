@@ -61,9 +61,9 @@ const int MUX_A               =   3;
 const int MUX_B               =   4;
 const int MUX_C               =   5;
 const int MUX_D               =   6;
-const int MUX_0               =   0;
-const int MUX_1               =   1;
-const int MUX_2               =   2;
+const int MUX_0               =   A0;
+const int MUX_1               =   A1;
+const int MUX_2               =   A2;
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------Control and Configuration values Definition-------------------------------------------
@@ -78,8 +78,8 @@ const int SW_ITE_MAX          =   5;
 const int SW_Q                =  29;
 const int SW_THR              = 800; // Switch Threshold (Fake Digital)
 const int MAX_MENU            =   3; // Menu Mode Flag (Values 0, 1)
-const int FADESTEPS_C         =   6; // GENERAL FadeSteps
-const int FADEDELAY_C         =  10; // GENERAL FadeDelay
+const int FADESTEPS_C         =   5; // GENERAL FadeSteps
+const int FADEDELAY_C         =   5; // GENERAL FadeDelay
 const int MUX_SETUP_DELAY     =   7; // Mux Delay for PZPad
 const int PZ_MEASURE_CYCLE    =   3;
 const int PZ_AUTOCAL_CYCLES   =  30;
@@ -88,16 +88,11 @@ const int PZ_Q                =   7;     // Piezo Quantity
 const int PZ_RLX              =   5;     // Piezo Relax Time (ms)
 const int NOTE_DURATION       = 100;
 
-const int MODE                =   0;  
-const int INSTR               =   1;  
-const int SCALE               =   2;  
-const int SEQ                 =   3;  
-const int EFCT                =   4;
-const int MODU                =   5;
-const int OCTV                =   6;
-const int VOL                 =   7;
-const int PANIC               =   8;
-const int MENU                =   9;
+const int TIME_PANIC_MS       = 1000;
+const int TIME_SAVE_MS        = 2000;
+
+unsigned long SW_Time_Start   =   0; // SW ON Time Measure Variable
+unsigned long SW_Time_Current =   0; // SW ON Time Measure Variable
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------Custom Configuration Structs----------------------------------------------------------
@@ -120,6 +115,11 @@ struct LEDCOL{
 struct SWCTRL{
   int    ID;
   int    Val;
+};
+
+struct CHORD{
+  int    ITV_0;
+  int    ITV_1;
 };
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
@@ -200,6 +200,7 @@ LEDCOL MENU_ON   = {GC[0],   GC[255],  GC[255]};  // SW_MENU ON LED COLOR
 LEDCOL PANIC_ON  = {GC[255], GC[0],    GC[0]};    // SW_MENU ON LED COLOR
 LEDCOL NUSE_ON   = {GC[0],   GC[255],  GC[0]};    // SW_MENU ON LED COLOR
 LEDCOL SEQ_ON    = {GC[0],   GC[255],  GC[100]};  // SW_SEQ ON LED COLOR
+LEDCOL RESET_ON  = {GC[255], GC[0],    GC[0]};  // SW_SEQ ON LED COLOR
 
 LEDCOL INSTR_0   = {GC[72],    GC[252],  GC[36]};   // INSTR_0 ON LED COLOR
 LEDCOL INSTR_1   = {GC[36],    GC[216],  GC[72]};   // INSTR_1 ON LED COLOR
@@ -209,16 +210,16 @@ LEDCOL INSTR_4   = {GC[216],   GC[108],  GC[180]};  // INSTR_4 ON LED COLOR
 LEDCOL INSTR_5   = {GC[180],   GC[72],   GC[216]};  // INSTR_5 ON LED COLOR
 LEDCOL INSTR_6   = {GC[144],   GC[36],   GC[252]};  // INSTR_6 ON LED COLOR
 
-SWCTRL SW_MODE  = {MODE,  0};  
-SWCTRL SW_INSTR = {INSTR, 1};  
-SWCTRL SW_SCALE = {SCALE, 0};  
-SWCTRL SW_SEQ   = {SEQ,   0};  
-SWCTRL SW_EFCT  = {EFCT,  0};
-SWCTRL SW_MODU  = {MODU,  0};
-SWCTRL SW_OCTV  = {OCTV,  2};
-SWCTRL SW_VOL   = {VOL,   4};
-SWCTRL SW_PANIC = {PANIC, 0};
-SWCTRL SW_MENU  = {MENU,  0};
+SWCTRL SW_MODE  = {0, 0};  
+SWCTRL SW_INSTR = {1, 1};  
+SWCTRL SW_SCALE = {2, 0};  
+SWCTRL SW_SEQ   = {3, 0};  
+SWCTRL SW_EFCT  = {4, 0};
+SWCTRL SW_MODU  = {5, 0};
+SWCTRL SW_OCTV  = {6, 2};
+SWCTRL SW_VOL   = {7, 4};
+SWCTRL SW_PANIC = {8, 0};
+SWCTRL SW_MENU  = {9, 0};
 
 // Control Arrays for SW_Pad Mapping
 LEDCOL INSTR_COL[PZ_Q] = {INSTR_0, INSTR_1, INSTR_2, INSTR_3, INSTR_4, INSTR_5, INSTR_6};
@@ -230,7 +231,6 @@ SWPAD SW_ROW_CD[10]    = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD0, SWD1, SWD2, SWD3, 
 SWPAD SW_ROW_E[1]      = {SWE};
 SWPAD SW_ROW_F[1]      = {SWF};
 SWPAD SWPZ_ROW[PZ_Q]   = {SWPZA, SWPZB, SWPZC, SWPZD, SWPZE, SWPZF, SWPZG};
-SWCTRL CONFIG[8]       = {SW_MODE, SW_INSTR, SW_SCALE, SW_SEQ, SW_EFCT, SW_MODU, SW_OCTV, SW_VOL};
 int Menu            = 0;
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
