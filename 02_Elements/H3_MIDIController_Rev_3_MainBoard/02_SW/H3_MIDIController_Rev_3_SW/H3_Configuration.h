@@ -87,12 +87,14 @@ const int PZ_GEN_THR          =   3;
 const int PZ_Q                =   7;     // Piezo Quantity
 const int PZ_RLX              =   5;     // Piezo Relax Time (ms)
 const int NOTE_DURATION       = 100;
+const int MENU_Q              =   1;  // Always add 1. MENU_Q = 1 means 2 Menus (0 and 1)
 
 const int TIME_PANIC_MS       = 1000;
 const int TIME_SAVE_MS        = 2000;
 
 unsigned long SW_Time_Start   =   0; // SW ON Time Measure Variable
 unsigned long SW_Time_Current =   0; // SW ON Time Measure Variable
+int Menu                      =   0;
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------Custom Configuration Structs----------------------------------------------------------
@@ -192,7 +194,7 @@ LEDCOL BIG_ON    = {GC[255], GC[255],  GC[255]};  // SW_GENERAL OFF LED COLOR
 LEDCOL SCALE_ON  = {GC[255], GC[0],    GC[102]};  // SW_SCALE ON LED COLOR
 LEDCOL MODE_ON   = {GC[51],  GC[204],  GC[255]};  // SW_MODE ON LED COLOR
 LEDCOL INSTR_ON  = {GC[51],  GC[204],  GC[51]};   // SW_INSTR ON LED COLOR
-LEDCOL VOL_ON    = {GC[100], GC[0],    GC[40]};   // SW_VOL ON LED COLOR
+LEDCOL VEL_ON    = {GC[100], GC[255],  GC[40]};   // SW_VEL ON LED COLOR
 LEDCOL OCTV_ON   = {GC[255], GC[153],  GC[51]};   // SW_OCTV ON LED COLOR
 LEDCOL MODU_ON   = {GC[100], GC[0],    GC[100]};  // SW_MODU ON LED COLOR
 LEDCOL EFCT_ON   = {GC[0],   GC[100],  GC[0]};    // SW_EFCT ON LED COLOR
@@ -201,6 +203,11 @@ LEDCOL PANIC_ON  = {GC[255], GC[0],    GC[0]};    // SW_MENU ON LED COLOR
 LEDCOL NUSE_ON   = {GC[0],   GC[255],  GC[0]};    // SW_MENU ON LED COLOR
 LEDCOL SEQ_ON    = {GC[0],   GC[255],  GC[100]};  // SW_SEQ ON LED COLOR
 LEDCOL RESET_ON  = {GC[255], GC[0],    GC[0]};  // SW_SEQ ON LED COLOR
+LEDCOL FRST_ON   = {GC[255], GC[0],    GC[255]};  // SW_SEQ ON LED COLOR
+
+LEDCOL VSWAP_ON  = {GC[255], GC[0],    GC[255]};    // SW_MENU ON LED COLOR
+LEDCOL CHORD_ON  = {GC[255], GC[255],  GC[0]};  // SW_SEQ ON LED COLOR
+LEDCOL SDBG_ON   = {GC[255], GC[100],  GC[0]};  // SW_SEQ ON LED COLOR
 
 LEDCOL INSTR_0   = {GC[72],    GC[252],  GC[36]};   // INSTR_0 ON LED COLOR
 LEDCOL INSTR_1   = {GC[36],    GC[216],  GC[72]};   // INSTR_1 ON LED COLOR
@@ -217,9 +224,15 @@ SWCTRL SW_SEQ   = {3, 0};
 SWCTRL SW_EFCT  = {4, 0};
 SWCTRL SW_MODU  = {5, 0};
 SWCTRL SW_OCTV  = {6, 2};
-SWCTRL SW_VOL   = {7, 4};
+SWCTRL SW_VEL   = {7, 4};
 SWCTRL SW_PANIC = {8, 0};
 SWCTRL SW_MENU  = {9, 0};
+SWCTRL SW_VSWAP = {10,0};
+SWCTRL SW_SDBG  = {11,0};
+SWCTRL SW_CHORD = {12,0};
+SWCTRL SW_FRST  = {13,0};
+
+SWCTRL SW_DOUT  = {14,0};  // Dummy SWCTRL for FadeOut
 
 // Control Arrays for SW_Pad Mapping
 LEDCOL INSTR_COL[PZ_Q] = {INSTR_0, INSTR_1, INSTR_2, INSTR_3, INSTR_4, INSTR_5, INSTR_6};
@@ -228,10 +241,10 @@ SWPAD SW_ROW_B[5]      = {SWB0, SWB1, SWB2, SWB3, SWB4};
 SWPAD SW_ROW_C[5]      = {SWC0, SWC1, SWC2, SWC3, SWC4};
 SWPAD SW_ROW_D[5]      = {SWD0, SWD1, SWD2, SWD3, SWD4};
 SWPAD SW_ROW_CD[10]    = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD0, SWD1, SWD2, SWD3, SWD4}; 
+SWPAD SW_ROW_CD2[12]   = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD4, SWD3, SWD2, SWD1, SWD0, SWB0, SWB1}; 
 SWPAD SW_ROW_E[1]      = {SWE};
 SWPAD SW_ROW_F[1]      = {SWF};
 SWPAD SWPZ_ROW[PZ_Q]   = {SWPZA, SWPZB, SWPZC, SWPZD, SWPZE, SWPZF, SWPZG};
-int Menu            = 0;
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // -----------------------------------------------------Control Arrays for PZ PAD-----------------------------------------------------------
