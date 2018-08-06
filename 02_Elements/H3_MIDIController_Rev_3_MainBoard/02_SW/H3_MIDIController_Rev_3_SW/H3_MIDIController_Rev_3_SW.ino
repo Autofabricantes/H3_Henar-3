@@ -52,19 +52,23 @@ EEPROM_saveConfigFS(6);*/
 }
 
 void loop() {
-   switch(SW_MENU){
-      case 0:
-        readSW_MENU0();
-        break;
-      case 1:
-        readSW_MENU1();
-        break;
-      default:
-        break;
-   }
-   SWE = readSW_SW_MENU(SWE, GEN_OFF, INSTR_COL[SW_INSTR], FADESTEPS_C, FADEDELAY_C);
-   SWF = readSW_PANIC(SWF, RESET_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   SWPZ_Read(SWPZ_ROW, PZ_Q, INSTR_COL[SW_INSTR], GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+  if(!SW_SLEEP){
+     switch(SW_MENU){
+        case 0:
+          readSW_MENU0();
+          break;
+        case 1:
+          readSW_MENU1();
+          break;
+        default:
+          break;
+     }
+     SWE = readSW_SW_MENU(SWE, GEN_OFF, INSTR_COL[SW_INSTR], FADESTEPS_C, FADEDELAY_C);
+     SWF = readSW_PANIC(SWF, RESET_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+     SWPZ_Read(SWPZ_ROW, PZ_Q, INSTR_COL[SW_INSTR], GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+  }else{ // Sleep Mode
+     SWF = readSW_SLEEP(SWF);
+  }
 }
 
 void readSW_MENU0(void){
@@ -77,29 +81,19 @@ void readSW_MENU0(void){
 
 void fadeOUT_SW_MENU0(void){
    if(SW_CHORD){SW_LED_FadeSingle_DW(SWB4, CHORD_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
    if(SW_VSWAP){SW_LED_FadeSingle_DW(SWB3, VSWAP_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
    if(SW_SEQ){SW_LED_FadeSingle_DW(SWB2, SEQ_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
    SW_LED_ColumnFade(SW_ROW_CD2, 0, SW_MODE, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
    SW_LED_ColumnFade(SW_ROW_A, 0, SW_OCTV, OCTV_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
 }
 
 void fadeIN_SW_MENU0(void){
    SW_LED_ColumnFade(SW_ROW_CD2, SW_MODE, 0, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
    SW_LED_ColumnFade(SW_ROW_A, SW_OCTV, 0, OCTV_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
    if(SW_SEQ){SW_LED_FadeSingle_UP(SWB2, SEQ_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
    if(SW_VSWAP){SW_LED_FadeSingle_UP(SWB3, VSWAP_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
    if(SW_CHORD){SW_LED_FadeSingle_UP(SWB4, CHORD_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
-}
+ }
 
 void readSW_MENU1(void){
    SW_VEL   = readSW_ROW(SW_ROW_A, (sizeof(SW_ROW_A)/sizeof(SWPAD)), SW_VEL, VEL_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
@@ -112,29 +106,43 @@ void readSW_MENU1(void){
 
 void fadeOUT_SW_MENU1(void){
    if(SW_SDBG){SW_LED_FadeSingle_DW(SWD4, SDBG_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
    if(SW_FRST){SW_LED_FadeSingle_DW(SWD3, FRST_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
    SW_LED_ColumnFade(SW_ROW_A, 0, SW_VEL, VEL_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
    SW_LED_ColumnFade(SW_ROW_B, 0, SW_SCALE, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
    SW_LED_ColumnFade(SW_ROW_C, 0, SW_CHORDTYPE, CHORD_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
 }
 
 void fadeIN_SW_MENU1(void){
    SW_LED_ColumnFade(SW_ROW_C, SW_CHORDTYPE,0, CHORD_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
    SW_LED_ColumnFade(SW_ROW_B, SW_SCALE, 0, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
    SW_LED_ColumnFade(SW_ROW_A, SW_VEL, 0, VEL_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-   delay(50);
    if(SW_FRST){SW_LED_FadeSingle_UP(SWD3, FRST_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
    if(SW_SDBG){SW_LED_FadeSingle_UP(SWD4, SDBG_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
-   delay(50);
 }
+
+/*void readSW_MENU2(void){
+   for(int i = 0; i < (sizeof(SW_ROW_SSEQ_0)/sizeof(SWPAD)); i++){
+      SW_SSEQ_0[i] = readSW_Binary(SW_ROW_SSEQ_0[i], SW_SSEQ_0[i], SSEQ_0_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+      SW_SSEQ_1[i] = readSW_Binary(SW_ROW_SSEQ_1[i], SW_SSEQ_1[i], SSEQ_1_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+   }
+   SW_RTH   = readSW_ROW(SW_ROW_RTH, (sizeof(SW_ROW_RTH)/sizeof(SWPAD)), SW_RTH, RTH_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+}
+
+void fadeOUT_SW_MENU2(void){
+   for(int i = 0; i < (sizeof(SW_ROW_SSEQ_0)/sizeof(SWPAD)); i++){
+      if(SW_SSEQ_0[i]){SW_LED_FadeSingle_DW(SW_ROW_SSEQ_0[i], SSEQ_0_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
+      if(SW_SSEQ_1[i]){SW_LED_FadeSingle_DW(SW_ROW_SSEQ_1[i], SSEQ_1_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
+   }
+   SW_LED_ColumnFade(SW_ROW_RTH, 0, SW_RTH, RTH_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+}
+
+void fadeIN_SW_MENU2(void){
+   for(int i = 0; i < (sizeof(SW_ROW_SSEQ_0)/sizeof(SWPAD)); i++){
+      if(SW_SSEQ_0[i]){SW_LED_FadeSingle_UP(SW_ROW_SSEQ_0[i], SSEQ_0_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
+      if(SW_SSEQ_1[i]){SW_LED_FadeSingle_UP(SW_ROW_SSEQ_1[i], SSEQ_1_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);}
+   }
+   SW_LED_ColumnFade(SW_ROW_RTH, SW_RTH, 0, RTH_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+}*/
 
 int readSW_ROW(SWPAD SW_ROW[], int arraySize, int SW_CTRL, LEDCOL COL_ON, LEDCOL COL_OFF, int fadeSteps, int fadeDelay){ // Should Remove arraySize somehow
   int prevON = SW_CTRL;
@@ -215,7 +223,7 @@ int readSW_ROW_INSTR(SWPAD SW_ROW[], int arraySize, int SW_CTRL, LEDCOL COL_ON[]
   return SW_CTRL;
 }
 
-void SW_SW_MENU_Transition(int newSW_MENU){
+void SW_MENU_Transition(int newSW_MENU){
   if(newSW_MENU == 1){ // Transiopn from SW_MENU MAX_SW_MENU to SW_MENU 0
     fadeOUT_SW_MENU0();
     SW_LED_CleanCanvas(GEN_OFF);
@@ -248,7 +256,7 @@ if(SW_SDBG){
 }
     
     }
-    delay(100);   
+    delay(10);   
   }
    return SW_CTRL;
 }
@@ -270,7 +278,16 @@ if(SW_SDBG){
    if (SW_Pad.swAct){                      // if SW Pad previously activated
      SW_Pad.swAct = OFF;                   // Set SW_Pad as ON
      SW_Time_Current = millis();
-     if((SW_Time_Current - SW_Time_Start) > TIME_PANIC_MS){
+     if((SW_Time_Current - SW_Time_Start) > TIME_SLEEP_MS){ // Enter Sleep Mode
+        SW_SLEEP = 1;
+        SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
+        delay(100);
+        SW_LED_FadeSingle_UP(SW_Pad, SLEEP_ON, COL_OFF,  FS, FD); // Update LED Stripe
+        muteChannel(SW_INSTR, FD);
+        SW_LED_FadeSingle_DW(SW_Pad, SLEEP_ON, COL_OFF,  FS, FD); // Update LED Stripe
+        SW_LED_ShutDown();
+        delay(1000);
+     }else if((SW_Time_Current - SW_Time_Start) > TIME_PANIC_MS){
         SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
         delay(100);
         SW_LED_FadeSingle_UP(SW_Pad, SAVE_ON, COL_OFF,  FS, FD); // Update LED Stripe
@@ -284,6 +301,25 @@ if(SW_SDBG){
    }
   }
    return SW_Pad;
+}
+
+SWPAD readSW_SLEEP(SWPAD SW_Pad){ // Should Remove arraySize somehow
+  SET_MUXGATE(SW_Pad.muxPos);
+  if (!digitalRead(SW_Pad.muxID)){    // If SW Pad activated // TODO Change to digitalRead()
+   if (!SW_Pad.swAct){                      // if SW Pad not previously activated
+      SW_Pad.swAct = ON;                   // Set SW_Pad as ON
+      SW_Time_Start = millis();
+    }
+  }else{
+   if (SW_Pad.swAct){                      // if SW Pad previously activated
+     SW_Pad.swAct = OFF;                   // Set SW_Pad as ON
+     SW_Time_Current = millis();
+     if((SW_Time_Current - SW_Time_Start) > TIME_SLEEP_MS){ // Enter Sleep Mode
+        resetMachine();
+     }
+   }
+  }
+  return SW_Pad;
 }
 
 SWPAD readSW_SW_MENU(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){ // Should Remove arraySize somehow
@@ -315,7 +351,7 @@ if(SW_SDBG){
         }else{
           SW_MENU = 0;
         }
-        SW_SW_MENU_Transition(SW_MENU);
+        SW_MENU_Transition(SW_MENU);
      }
      SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
      SW_LED_FadeSingle_DW(SW_Pad, COL_OFF, COL_OFF,  FS, FD); // Update LED Stripe
@@ -420,6 +456,25 @@ void SW_LED_FadeSingle_FULL(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS,
     }
 }
 
+/*void StepSequencer(){
+  StepSeq_Time_Current = millis();
+  if((StepSeq_Time_Current - StepSeq_Time_Start)>(map(SW_RTH, 0 ,3, SSEQ_TIME_MIN_MS, SSEQ_TIME_MAX_MS))){
+    StepSeq_Time_Start = millis();
+    if(StepSeq < 8){StepSeq++;
+    }else{StepSeq=0;}
+    if(SW_SSEQ_0[StepSeq]){
+      MIDI_TX(SSEQ_0_INSTR, NOTE_ON, SSEQ_0_NOTE, (Velocity-((Velocity/2)*SW_VSWAP)));
+      delay(SSEQ_DELAY);
+      MIDI_TX(SSEQ_0_INSTR, NOTE_OFF, SSEQ_0_NOTE, 0);
+    }
+    if(SW_SSEQ_1[StepSeq]){
+      MIDI_TX(SSEQ_1_INSTR, NOTE_ON, SSEQ_1_NOTE, (Velocity-((Velocity/2)*SW_VSWAP)));
+      delay(SSEQ_DELAY);
+      MIDI_TX(SSEQ_1_INSTR, NOTE_OFF, SSEQ_1_NOTE, 0);
+    }  
+  }
+}*/
+
 void SW_LED_FadeSingle_UP(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){
     int RDiff = (COL_OFF.red-COL_ON.red);
     int GDiff = (COL_OFF.green-COL_ON.green);
@@ -469,7 +524,7 @@ void  SW_LED_Initialization_Start(void){
 
 void  SW_LED_ShutDown(void){
   for (int h = 0; h < 5; h++){
-    for (int i = 0; i < 120; i++){
+    for (int i = 0; i < 128; i++){
       ledPadStripe.setPixelColor(SW_ROW_A[4-h].ledPos, 255-(i*2), 255-(i*2), 255-(i*2)); // Heavy Stuff
       ledPadStripe.setPixelColor(SW_ROW_B[4-h].ledPos, 255-(i*2), 255-(i*2), 255-(i*2)); // Heavy Stuff
       ledPadStripe.setPixelColor(SW_ROW_C[4-h].ledPos, 255-(i*2), 255-(i*2), 255-(i*2)); // Heavy Stuff
@@ -478,6 +533,16 @@ void  SW_LED_ShutDown(void){
       delay(2);
     }
   }
+  for (int h = 0; h < PZ_Q; h++){
+    for (int i = 0; i < 128; i++){
+      ledPadStripe.setPixelColor(SWPZ_ROW[h].ledPos, 255-(i*2), 255-(i*2), 255-(i*2)); // Heavy Stuff
+      ledPadStripe.show(); // Update LEDs
+      delay(2);
+    }
+  }
+  ledPadStripe.setPixelColor(SWE.ledPos, 0, 0, 0); // Heavy Stuff
+  ledPadStripe.setPixelColor(SWF.ledPos, 0, 0, 0); // Heavy Stuff
+  ledPadStripe.show(); // Update LEDs
 }
 
 void  SW_LED_Initialization_End(void){
@@ -487,45 +552,53 @@ void  SW_LED_Initialization_End(void){
 void  EEPROM_saveConfig(int INSTR){
   int EEPROMdir = (INSTR_BLOCK*INSTR);
   EEPROM_writeAnything((EEPROMdir), SW_MODE);
-  Serial << "write SW_MODE: " << SW_MODE << " EEPROM POS: " << EEPROMdir << endl;      
   EEPROM_writeAnything((EEPROMdir+8), SW_SCALE);
-  Serial << "write SW_SCALE: " << SW_SCALE << " EEPROM POS: " << EEPROMdir+8 << endl;      
   EEPROM_writeAnything((EEPROMdir+12), SW_SEQ);
-  Serial << "write SW_SEQ: " << SW_SEQ << " EEPROM POS: " << EEPROMdir+12 << endl;      
   EEPROM_writeAnything((EEPROMdir+16), SW_OCTV);
-  Serial << "write SW_OCTV: " << SW_OCTV << " EEPROM POS: " << EEPROMdir+16 << endl;      
   EEPROM_writeAnything((EEPROMdir+20), SW_VEL);
-  Serial << "write SW_VEL: " << SW_VEL << " EEPROM POS: " << EEPROMdir+20 << endl;      
   EEPROM_writeAnything((EEPROMdir+24), SW_VSWAP);
-  Serial << "write SW_VSWAP: " << SW_VSWAP << " EEPROM POS: " << EEPROMdir+24 << endl;      
   EEPROM_writeAnything((EEPROMdir+28), SW_SDBG);
-  Serial << "write SW_SDBG: " << SW_SDBG << " EEPROM POS: " << EEPROMdir+28 << endl;      
   EEPROM_writeAnything((EEPROMdir+32), SW_CHORD);
-  Serial << "write SW_CHORD: " << SW_CHORD << " EEPROM POS: " << EEPROMdir+32 << endl;      
-  EEPROM_writeAnything((EEPROMdir+36), SW_CHORDTYPE); 
-  Serial << "write SW_CHORDTYPE: " << SW_CHORDTYPE << " EEPROM POS: " << EEPROMdir+36 << endl;  
+  EEPROM_writeAnything((EEPROMdir+36), SW_CHORDTYPE);
+   
+  if(SW_SDBG){
+    Serial << "Save Config for INSTR: " << INSTR << endl; 
+    Serial << "write SW_MODE: " << SW_MODE << " EEPROM POS: " << EEPROMdir << endl;
+    Serial << "write SW_SCALE: " << SW_SCALE << " EEPROM POS: " << EEPROMdir+8 << endl;
+    Serial << "write SW_SEQ: " << SW_SEQ << " EEPROM POS: " << EEPROMdir+12 << endl;  
+    Serial << "write SW_OCTV: " << SW_OCTV << " EEPROM POS: " << EEPROMdir+16 << endl; 
+    Serial << "write SW_VEL: " << SW_VEL << " EEPROM POS: " << EEPROMdir+20 << endl;   
+    Serial << "write SW_VSWAP: " << SW_VSWAP << " EEPROM POS: " << EEPROMdir+24 << endl;
+    Serial << "write SW_SDBG: " << SW_SDBG << " EEPROM POS: " << EEPROMdir+28 << endl; 
+    Serial << "write SW_CHORD: " << SW_CHORD << " EEPROM POS: " << EEPROMdir+32 << endl;
+    Serial << "write SW_CHORDTYPE: " << SW_CHORDTYPE << " EEPROM POS: " << EEPROMdir+36 << endl;  
+  }
 }
 
 void  EEPROM_saveConfigFS(int INSTR){
   int EEPROMdir = (INSTR_BLOCK*INSTR);
   EEPROM_writeAnything((EEPROMdir), FRST_MODE);
-  Serial << "write FRST_MODE: " << FRST_MODE << " EEPROM POS: " << EEPROMdir << endl;      
   EEPROM_writeAnything((EEPROMdir+8), FRST_SCALE);
-  Serial << "write FRST_SCALE: " << FRST_SCALE << " EEPROM POS: " << EEPROMdir+8 << endl;      
   EEPROM_writeAnything((EEPROMdir+12), FRST_SEQ);
-  Serial << "write FRST_SEQ: " << FRST_SEQ << " EEPROM POS: " << EEPROMdir+12 << endl;      
   EEPROM_writeAnything((EEPROMdir+16), FRST_OCTV);
-  Serial << "write FRST_OCTV: " << FRST_OCTV << " EEPROM POS: " << EEPROMdir+16 << endl;      
   EEPROM_writeAnything((EEPROMdir+20), FRST_VEL);
-  Serial << "write FRST_VEL: " << FRST_VEL << " EEPROM POS: " << EEPROMdir+20 << endl;      
   EEPROM_writeAnything((EEPROMdir+24), FRST_VSWAP);
-  Serial << "write FRST_VSWAP: " << FRST_VSWAP << " EEPROM POS: " << EEPROMdir+24 << endl;      
   EEPROM_writeAnything((EEPROMdir+28), FRST_SDBG);
-  Serial << "write FRST_SDBG: " << FRST_SDBG << " EEPROM POS: " << EEPROMdir+28 << endl;      
   EEPROM_writeAnything((EEPROMdir+32), FRST_CHORD);
-  Serial << "write FRST_CHORD: " << FRST_CHORD << " EEPROM POS: " << EEPROMdir+32 << endl;      
   EEPROM_writeAnything((EEPROMdir+36), FRST_CHORDTYPE); 
-  Serial << "write FRST_CHORDTYPE: " << FRST_CHORDTYPE << " EEPROM POS: " << EEPROMdir+36 << endl;   
+
+  if(SW_SDBG){
+    Serial << "Factory Reset for INSTR: " << INSTR << endl; 
+    Serial << "write FRST_MODE: " << FRST_MODE << " EEPROM POS: " << EEPROMdir << endl; 
+    Serial << "write FRST_SCALE: " << FRST_SCALE << " EEPROM POS: " << EEPROMdir+8 << endl;  
+    Serial << "write FRST_SEQ: " << FRST_SEQ << " EEPROM POS: " << EEPROMdir+12 << endl; 
+    Serial << "write FRST_OCTV: " << FRST_OCTV << " EEPROM POS: " << EEPROMdir+16 << endl;
+    Serial << "write FRST_VEL: " << FRST_VEL << " EEPROM POS: " << EEPROMdir+20 << endl;
+    Serial << "write FRST_VSWAP: " << FRST_VSWAP << " EEPROM POS: " << EEPROMdir+24 << endl;
+    Serial << "write FRST_SDBG: " << FRST_SDBG << " EEPROM POS: " << EEPROMdir+28 << endl;
+    Serial << "write FRST_CHORD: " << FRST_CHORD << " EEPROM POS: " << EEPROMdir+32 << endl;
+    Serial << "write FRST_CHORDTYPE: " << FRST_CHORDTYPE << " EEPROM POS: " << EEPROMdir+36 << endl;   
+  }
 }
 
 void EEPROM_factoryReset(){
@@ -537,23 +610,27 @@ void EEPROM_factoryReset(){
 void  EEPROM_readConfig(int INSTR){
   int EEPROMdir = (INSTR_BLOCK*INSTR);
   EEPROM_readAnything((EEPROMdir), SW_MODE);
-  Serial << "Read SW_MODE: " << SW_MODE << " EEPROM POS: " << EEPROMdir << endl;      
   EEPROM_readAnything((EEPROMdir+8), SW_SCALE);
-  Serial << "Read SW_SCALE: " << SW_SCALE << " EEPROM POS: " << EEPROMdir+8 << endl;      
   EEPROM_readAnything((EEPROMdir+12), SW_SEQ);
-  Serial << "Read SW_SEQ: " << SW_SEQ << " EEPROM POS: " << EEPROMdir+12 << endl;      
   EEPROM_readAnything((EEPROMdir+16), SW_OCTV);
-  Serial << "Read SW_OCTV: " << SW_OCTV << " EEPROM POS: " << EEPROMdir+16 << endl;      
   EEPROM_readAnything((EEPROMdir+20), SW_VEL);
-  Serial << "Read SW_VEL: " << SW_VEL << " EEPROM POS: " << EEPROMdir+20 << endl;      
   EEPROM_readAnything((EEPROMdir+24), SW_VSWAP);
-  Serial << "Read SW_VSWAP: " << SW_VSWAP << " EEPROM POS: " << EEPROMdir+24 << endl;      
   EEPROM_readAnything((EEPROMdir+28), SW_SDBG);
-  Serial << "Read SW_SDBG: " << SW_SDBG << " EEPROM POS: " << EEPROMdir+28 << endl;      
   EEPROM_readAnything((EEPROMdir+32), SW_CHORD);
-  Serial << "Read SW_CHORD: " << SW_CHORD << " EEPROM POS: " << EEPROMdir+32 << endl;      
-  EEPROM_readAnything((EEPROMdir+36), SW_CHORDTYPE); 
-  Serial << "Read SW_CHORDTYPE: " << SW_CHORDTYPE << " EEPROM POS: " << EEPROMdir+36 << endl;      
+  EEPROM_readAnything((EEPROMdir+36), SW_CHORDTYPE);
+  
+  if(SW_SDBG){
+    Serial << "Read Config for INSTR: " << INSTR << endl; 
+    Serial << "Read SW_MODE: " << SW_MODE << " EEPROM POS: " << EEPROMdir << endl;
+    Serial << "Read SW_SCALE: " << SW_SCALE << " EEPROM POS: " << EEPROMdir+8 << endl;
+    Serial << "Read SW_SEQ: " << SW_SEQ << " EEPROM POS: " << EEPROMdir+12 << endl;
+    Serial << "Read SW_OCTV: " << SW_OCTV << " EEPROM POS: " << EEPROMdir+16 << endl; 
+    Serial << "Read SW_VEL: " << SW_VEL << " EEPROM POS: " << EEPROMdir+20 << endl; 
+    Serial << "Read SW_VSWAP: " << SW_VSWAP << " EEPROM POS: " << EEPROMdir+24 << endl;
+    Serial << "Read SW_SDBG: " << SW_SDBG << " EEPROM POS: " << EEPROMdir+28 << endl; 
+    Serial << "Read SW_CHORD: " << SW_CHORD << " EEPROM POS: " << EEPROMdir+32 << endl; 
+    Serial << "Read SW_CHORDTYPE: " << SW_CHORDTYPE << " EEPROM POS: " << EEPROMdir+36 << endl;
+  }      
 }
 
 void MIDI_TX(byte MIDICHANNEL, byte MESSAGE, byte PITCH, byte VELOCITY) {

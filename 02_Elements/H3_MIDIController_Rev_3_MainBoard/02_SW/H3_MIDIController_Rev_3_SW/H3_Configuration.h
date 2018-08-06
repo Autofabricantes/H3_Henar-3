@@ -89,12 +89,30 @@ const int PZ_RLX              =   5;     // Piezo Relax Time (ms)
 const int NOTE_DURATION       = 100;
 const int MENU_Q              =   1;  // Always add 1. MENU_Q = 1 means 2 Menus (0 and 1)
 
+//const int SSEQ_TIME_MIN_MS    =  100;
+//const int SSEQ_TIME_MAX_MS    = 2000;
+//const int SSEQ_0_INSTR        =    3;
+//const int SSEQ_1_INSTR        =    4;
+//const int SSEQ_DELAY          =   10;
+//const byte SSEQ_0_NOTE        =   60;
+//const byte SSEQ_1_NOTE        =   60;
+
 const int TIME_PANIC_MS       = 1000;
 const int TIME_SAVE_MS        = 2000;
+const int TIME_SLEEP_MS       = 3000;
 
+// General Parameters
 unsigned long SW_Time_Start   =   0; // SW ON Time Measure Variable
 unsigned long SW_Time_Current =   0; // SW ON Time Measure Variable
 int Velocity                  =   127;
+
+// Step Sequencer Parameters
+//int SSEQ_0[8] = {0,0,0,0,0,0,0,0};
+//int SSEQ_1[8] = {0,0,0,0,0,0,0,0};
+//unsigned long StepSeq_Time_Start   =   0; // SW ON Time Measure Variable
+//unsigned long StepSeq_Time_Current =   0; // SW ON Time Measure Variable
+//int StepSeq                        =   0; // SW ON Time Measure Variable
+
 
 // Factory Reset values
 const int  FRST_MODE       = 0;  
@@ -129,10 +147,6 @@ struct LEDCOL{
   int blue;
 };
 
-struct CHORD{
-  int    ITV_0;
-  int    ITV_1;
-};
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------LED Gamma Correction LUT--------------------------------------------------------------
@@ -213,6 +227,10 @@ LEDCOL VSWAP_ON  = {GC[255], GC[0],    GC[255]};    // SW_MENU ON LED COLOR
 LEDCOL CHORD_ON  = {GC[255], GC[255],  GC[0]};  // SW_SEQ ON LED COLOR
 LEDCOL SDBG_ON   = {GC[255], GC[100],  GC[0]};  // SW_SEQ ON LED COLOR
 LEDCOL SAVE_ON   = {GC[0],   GC[255],  GC[0]};  // SW_SEQ ON LED COLOR
+LEDCOL SSEQ_0_ON = {GC[255], GC[0],    GC[255]};  // SW_SEQ ON LED COLOR
+LEDCOL SSEQ_1_ON = {GC[255], GC[153],  GC[51]};   // SW_OCTV ON LED COLOR
+LEDCOL RTH_ON    = {GC[0],   GC[0],    GC[255]};  // SW_SEQ ON LED COLOR
+LEDCOL SLEEP_ON  = {GC[255], GC[0],    GC[255]};  // SW_SEQ ON LED COLOR
 
 LEDCOL INSTR_0   = {GC[72],    GC[252],  GC[36]};   // INSTR_0 ON LED COLOR
 LEDCOL INSTR_1   = {GC[36],    GC[216],  GC[72]};   // INSTR_1 ON LED COLOR
@@ -235,7 +253,7 @@ int SW_SDBG       = 0;
 int SW_CHORD      = 0;
 int SW_FRST       = 0;
 int SW_CHORDTYPE  = 4;
-
+int SW_SLEEP      = 0;
 
 // Control Arrays for SW_Pad Mapping
 LEDCOL INSTR_COL[PZ_Q] = {INSTR_0, INSTR_1, INSTR_2, INSTR_3, INSTR_4, INSTR_5, INSTR_6};
@@ -247,6 +265,9 @@ SWPAD SW_ROW_CD[10]    = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD0, SWD1, SWD2, SWD3, 
 SWPAD SW_ROW_CD2[12]   = {SWC0, SWC1, SWC2, SWC3, SWC4, SWD4, SWD3, SWD2, SWD1, SWD0, SWB0, SWB1}; 
 SWPAD SW_ROW_E[1]      = {SWE};
 SWPAD SW_ROW_F[1]      = {SWF};
+SWPAD SW_ROW_SSEQ_0[8] = {SWA4, SWA3, SWA2, SWA1, SWA0, SWC0, SWC1, SWC2};
+SWPAD SW_ROW_SSEQ_1[8] = {SWB4, SWB3, SWB2, SWB1, SWB0, SWD0, SWD1, SWD2};
+SWPAD SW_ROW_RTH[4]    = {SWC3, SWC4, SWD4, SWD3};
 SWPAD SWPZ_ROW[PZ_Q]   = {SWPZA, SWPZB, SWPZC, SWPZD, SWPZE, SWPZF, SWPZG};
 
 // -----------------------------------------------------------------------------------------------------------------------------------------
@@ -277,4 +298,6 @@ int CHORDS[5][3] = {{0, 4, 7},   // Triada Mayor
 
 // EEPROM Directions Config
 const int  INSTR_BLOCK = 40;
+
+
 
