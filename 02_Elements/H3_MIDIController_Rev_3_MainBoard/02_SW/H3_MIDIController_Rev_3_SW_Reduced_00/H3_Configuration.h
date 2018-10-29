@@ -231,6 +231,9 @@ LEDCOL SSEQ_0_ON = {GC[255], GC[0],    GC[255]};  // SW_SEQ ON LED COLOR
 LEDCOL SSEQ_1_ON = {GC[255], GC[153],  GC[51]};   // SW_OCTV ON LED COLOR
 LEDCOL RTH_ON    = {GC[0],   GC[0],    GC[255]};  // SW_SEQ ON LED COLOR
 LEDCOL SLEEP_ON  = {GC[255], GC[0],    GC[255]};  // SW_SEQ ON LED COLOR
+LEDCOL STN_ON    = {GC[255], GC[255],    GC[0]};  // SW_STN ON LED COLOR
+LEDCOL MAJOR_ON  = {GC[255], GC[0],    GC[255]};  // SW_SCALE ON MAJOR_ON LED COLOR
+LEDCOL MINOR_ON  = {GC[255], GC[255],  GC[0]};  // SW_SCALE ON MINOR_ON LED COLOR
 
 LEDCOL INSTR_0   = {GC[72],    GC[252],  GC[36]};   // INSTR_0 ON LED COLOR
 LEDCOL INSTR_1   = {GC[36],    GC[216],  GC[72]};   // INSTR_1 ON LED COLOR
@@ -241,10 +244,10 @@ LEDCOL INSTR_5   = {GC[180],   GC[72],   GC[216]};  // INSTR_5 ON LED COLOR
 LEDCOL INSTR_6   = {GC[144],   GC[36],   GC[252]};  // INSTR_6 ON LED COLOR
 
 int SW_MODE       = 0;  
-int SW_INSTR      = 1;  
+int SW_INSTR      = 2;  
 int SW_SCALE      = 0;  
 int SW_SEQ        = 0;  
-int SW_OCTV       = 2;
+int SW_OCTV       = 6;
 int SW_VEL        = 4;
 int SW_PANIC      = 0;
 int SW_MENU       = 0;
@@ -254,6 +257,8 @@ int SW_CHORD      = 0;
 int SW_FRST       = 0;
 int SW_CHORDTYPE  = 4;
 int SW_SLEEP      = 0;
+int SW_STN        = 0; // ADDED
+int SW_SCALE_M    = 0; // ADDED
 
 // Control Arrays for SW_Pad Mapping
 LEDCOL INSTR_COL[PZ_Q] = {INSTR_0, INSTR_1, INSTR_2, INSTR_3, INSTR_4, INSTR_5, INSTR_6};
@@ -283,10 +288,10 @@ byte PZ_MIDI_BYTE_1[2][PZ_Q] = {{NOTE_ON,  NOTE_ON,   NOTE_ON,   NOTE_ON,   NOTE
 // MIDI First BYTE NOTE_OFF
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 byte PZ_MIDI_BYTE_2[6][PZ_Q] = {{NOTE_C1,  NOTE_D1,   NOTE_E1,   NOTE_F1,   NOTE_G1,   NOTE_A1,   NOTE_B1  },   // Escala Mayor             I-II-III-IV-V-VI-VII
-                                {NOTE_C1,  NOTE_D1,   NOTE_D1s,  NOTE_F1,   NOTE_G1,   NOTE_A1,   NOTE_A1s },   // Escala Menor Natural     I-II-IIIb-IV-V-VI-VIIb
                                 {NOTE_C1,  NOTE_E1,   NOTE_G1,   NOTE_B1,   NOTE_C2,   NOTE_E2,   NOTE_G2  },   // Escala Arpegio Maj7      I-III-V-VII-I'-III'-V'
-                                {NOTE_C1,  NOTE_D1s,  NOTE_G1,   NOTE_A1s,  NOTE_C2,   NOTE_D2s,  NOTE_G2  },   // Escala Arpegio Men7      I-IIb-V-VIIb-I'-IIIb'-V'
                                 {NOTE_C1,  NOTE_D1,   NOTE_E1,   NOTE_G1,   NOTE_A1,   NOTE_C2,   NOTE_D2  },   // Escala Pentatonico Mayor I-II-III-V-VI-I'-II'
+                                {NOTE_C1,  NOTE_D1,   NOTE_D1s,  NOTE_F1,   NOTE_G1,   NOTE_A1,   NOTE_A1s },   // Escala Menor Natural     I-II-IIIb-IV-V-VI-VIIb
+                                {NOTE_C1,  NOTE_D1s,  NOTE_G1,   NOTE_A1s,  NOTE_C2,   NOTE_D2s,  NOTE_G2  },   // Escala Arpegio Men7      I-IIb-V-VIIb-I'-IIIb'-V'            
                                 {NOTE_D1s, NOTE_F1,   NOTE_F1,   NOTE_G1,   NOTE_A1s,  NOTE_C2,   NOTE_D2s }};  // Escala Pentatonico Menor I-IIIb-IV-VIIb-I'-IIIb'
 // CHORD TABLE
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -299,6 +304,3 @@ int CHORDS[5][3] = {{0, 4, 7},   // Triada Mayor
 
 // EEPROM Directions Config
 const int  INSTR_BLOCK = 40;
-
-
-
