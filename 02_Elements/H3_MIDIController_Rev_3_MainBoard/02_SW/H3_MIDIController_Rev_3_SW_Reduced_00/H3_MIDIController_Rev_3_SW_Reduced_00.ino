@@ -31,7 +31,7 @@ void setup() {
 
   // LED Start Routine
   SW_LED_Initialization_Start();
-  SW_LED_Initialization_End();
+  //SW_LED_Initialization_End();
   
   // Param Initialization
   Velocity = map(SW_VEL, 0, 4, 10, 127);
