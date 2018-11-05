@@ -259,6 +259,7 @@ int SW_CHORDTYPE  = 4;
 int SW_SLEEP      = 0;
 int SW_STN        = 0; // ADDED
 int SW_SCALE_M    = 0; // ADDED
+int SW_SCALE_M_prev = 0; // ADDED
 
 // Control Arrays for SW_Pad Mapping
 LEDCOL INSTR_COL[PZ_Q] = {INSTR_0, INSTR_1, INSTR_2, INSTR_3, INSTR_4, INSTR_5, INSTR_6};

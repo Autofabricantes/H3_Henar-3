@@ -32,16 +32,14 @@ void setup() {
   // LED Start Routine
   SW_LED_Initialization_Start();
   SW_LED_Initialization_End();
-
-  
   
   // Param Initialization
   Velocity = map(SW_VEL, 0, 4, 10, 127);
 
-  SW_LED_ColumnFade(SW_ROW_CD2, SW_MODE, 0, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+  SW_LED_ColumnFade(SW_ROW_CD, SW_MODE, 0, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
   SW_LED_ColumnFade(SW_ROW_A, SW_INSTR, 0, INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
   SW_LED_ColumnFade(SW_ROW_BShort, SW_SCALE, 0, MAJOR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
-  
+  SW_LED_ColumnFade(SW_ROW_BShort, SW_SCALE, 0, MAJOR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
   SW_LED_FadeSingle_UP(SWB0, MINOR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
   SW_LED_FadeSingle_DW(SWB0, MAJOR_ON, MINOR_ON, FADESTEPS_C, FADEDELAY_C);
 }
@@ -50,17 +48,17 @@ void loop() {
    SW_MODE   = readSW_ROW(SW_ROW_CD2, (sizeof(SW_ROW_CD2)/sizeof(SWPAD)), SW_MODE, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
    SW_INSTR  = readSW_ROW(SW_ROW_A, (sizeof(SW_ROW_A)/sizeof(SWPAD)), SW_INSTR, INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
    // Special Octaver and Sosten
-   SW_STN = readSW_Sosten(SWE, SW_STN, GEN_OFF, STN_ON, FADESTEPS_C, FADEDELAY_C);
-   SW_OCTV = readSW_Octave(SWF, SW_OCTV, GEN_OFF, STN_ON, FADESTEPS_C, FADEDELAY_C);
+   SW_STN = readSW_Sosten(SWE, SW_STN, STN_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+   SW_OCTV = readSW_Octave(SWF, SW_OCTV, OCTV_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
    // Spacial Scale Modification
-   int SW_SCALE_M_prev = SW_SCALE_M;
+   SW_SCALE_M_prev = SW_SCALE_M;
    SW_SCALE_M = readSW_Binary(SWB1, SW_SCALE_M, MAJOR_ON , MINOR_ON , FADESTEPS_C, FADEDELAY_C); // Should Remove arraySize somehow
+   
    if(SW_SCALE_M_prev != SW_SCALE_M){
       if(!SW_SCALE_M){SCALE_ON = MAJOR_ON;}else{SCALE_ON = MINOR_ON;} // Color Change
       SW_LED_ColumnFade(SW_ROW_BShort, SW_SCALE, 0, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+      SW_LED_ColumnFade(SW_ROW_BShort, SW_SCALE, 0, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
    }
-
-
       
    SW_SCALE  = readSW_ROW(SW_ROW_BShort, (sizeof(SW_ROW_BShort)/sizeof(SWPAD)), SW_SCALE, SCALE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
    // PANIC READ
