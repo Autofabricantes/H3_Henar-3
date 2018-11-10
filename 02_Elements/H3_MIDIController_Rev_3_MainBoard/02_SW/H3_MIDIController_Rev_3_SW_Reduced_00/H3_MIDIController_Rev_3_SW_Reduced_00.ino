@@ -45,7 +45,7 @@ void setup() {
 }
 
 void loop() {
-   SW_MODE   = readSW_ROW(SW_ROW_CD2, (sizeof(SW_ROW_CD2)/sizeof(SWPAD)), SW_MODE, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
+   SW_MODE   = readSW_ROW(SW_ROW_CD, (sizeof(SW_ROW_CD2)/sizeof(SWPAD)), SW_MODE, MODE_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
    SW_INSTR  = readSW_ROW(SW_ROW_A, (sizeof(SW_ROW_A)/sizeof(SWPAD)), SW_INSTR, INSTR_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);
    // Special Octaver and Sosten
    SW_STN = readSW_Sosten(SWE, SW_STN, STN_ON, GEN_OFF, FADESTEPS_C, FADEDELAY_C);

@@ -244,7 +244,7 @@ LEDCOL INSTR_5   = {GC[180],   GC[72],   GC[216]};  // INSTR_5 ON LED COLOR
 LEDCOL INSTR_6   = {GC[144],   GC[36],   GC[252]};  // INSTR_6 ON LED COLOR
 
 int SW_MODE       = 0;  
-int SW_INSTR      = 2;  
+int SW_INSTR      = 0;  
 int SW_SCALE      = 0;  
 int SW_SEQ        = 0;  
 int SW_OCTV       = 6;
