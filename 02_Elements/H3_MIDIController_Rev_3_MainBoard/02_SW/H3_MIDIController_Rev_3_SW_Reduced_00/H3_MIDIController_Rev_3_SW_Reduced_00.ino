@@ -176,20 +176,12 @@ int readSW_Sosten(SWPAD SW_Pad, int SW_CTRL, LEDCOL COL_ON, LEDCOL COL_OFF, int 
       SW_CTRL = ON;                    // Set SW_Pad as ON
       MIDI_TX(SW_INSTR, CONTROL, CTRL_MOD, 127);
       SW_LED_FadeSingle_UP(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
-if(SW_SDBG){ 
-      Serial << "SWPAD ON: " << SW_Pad.swID << " MUX GATE: " << SW_Pad.muxPos << " LED: " << SW_Pad.ledPos << endl;
-      Serial << "Option turned ON" << endl;
-}
     }else{
       SW_CTRL = OFF;                    // Set SW_Pad as ON
       MIDI_TX(SW_INSTR, CONTROL, CTRL_MOD, 0);
       SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
-if(SW_SDBG){ 
-      Serial << "SWPAD ON: " << SW_Pad.swID << " MUX GATE: " << SW_Pad.muxPos << " LED: " << SW_Pad.ledPos << endl;
-      Serial << "Option turned OFF" << endl;
-}
     }
-    delay(10);   
+    delay(500);   
   }
    return SW_CTRL;
 }
@@ -197,24 +189,16 @@ if(SW_SDBG){
 int readSW_Octave(SWPAD SW_Pad, int SW_CTRL, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){ // Should Remove arraySize somehow
   SET_MUXGATE(SW_Pad.muxPos);
   if (!digitalRead(SW_Pad.muxID)){     // If SW Pad activated
-   if (!SW_CTRL){                      // if SW_CTRL is OFF
-      SW_CTRL = ON;                    // Set SW_Pad as ON
+   if (SW_CTRL == 6){                      // if SW_CTRL is OFF
+      //SW_Pad.swAct = ON;                   // Set SW_Pad as ON
       SW_LED_FadeSingle_UP(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
-      SW_CTRL = 6; // OCTAVATOR TEST
-if(SW_SDBG){ 
-      Serial << "SWPAD ON: " << SW_Pad.swID << " MUX GATE: " << SW_Pad.muxPos << " LED: " << SW_Pad.ledPos << endl;
-      Serial << "Option turned ON" << endl;
-}
-    }else{
-      SW_CTRL = OFF;                    // Set SW_Pad as ON
-      SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
       SW_CTRL = 7; // OCTAVATOR TEST
-if(SW_SDBG){ 
-      Serial << "SWPAD ON: " << SW_Pad.swID << " MUX GATE: " << SW_Pad.muxPos << " LED: " << SW_Pad.ledPos << endl;
-      Serial << "Option turned OFF" << endl;
-}
+    }else{
+      //SW_Pad.swAct = OFF;                   // Set SW_Pad as ON                 // Set SW_Pad as ON
+      SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
+      SW_CTRL = 6; // OCTAVATOR TEST
     }
-    delay(10);   
+    delay(500);   
   }
    return SW_CTRL;
 }
@@ -224,41 +208,18 @@ SWPAD readSW_PANIC(SWPAD SW_Pad, LEDCOL COL_ON, LEDCOL COL_OFF, int FS, int FD){
   if (!digitalRead(SW_Pad.muxID)){    // If SW Pad activated // TODO Change to digitalRead()
    if (!SW_Pad.swAct){                      // if SW Pad not previously activated
       SW_Pad.swAct = ON;                   // Set SW_Pad as ON
-      SW_Time_Start = millis();
+      for(int i = 0; i < 6; i++){
+        muteChannel(i, FD);
+      }
       SW_LED_FadeSingle_UP(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
-if(SW_SDBG){ 
-      Serial << "SWPAD ON: " << SW_Pad.swID << " MUX GATE: " << SW_Pad.muxPos << " LED: " << SW_Pad.ledPos << endl;
-      Serial << "Start Mute and Reset routine" << endl;
-}
-      
-    }
+   }
   }else{
    if (SW_Pad.swAct){                      // if SW Pad previously activated
      SW_Pad.swAct = OFF;                   // Set SW_Pad as ON
-     SW_Time_Current = millis();
-     if((SW_Time_Current - SW_Time_Start) > TIME_SLEEP_MS){ // Enter Sleep Mode
-        SW_SLEEP = 1;
-        SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
-        delay(100);
-        SW_LED_FadeSingle_UP(SW_Pad, SLEEP_ON, COL_OFF,  FS, FD); // Update LED Stripe
-        muteChannel(SW_INSTR, FD);
-        SW_LED_FadeSingle_DW(SW_Pad, SLEEP_ON, COL_OFF,  FS, FD); // Update LED Stripe
-        SW_LED_ShutDown();
-        delay(1000);
-     }else if((SW_Time_Current - SW_Time_Start) > TIME_PANIC_MS){
-        SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
-        delay(100);
-        SW_LED_FadeSingle_UP(SW_Pad, SAVE_ON, COL_OFF,  FS, FD); // Update LED Stripe
-        if(SW_FRST){EEPROM_factoryReset();} // Save Factory Reset Settings for all INSTR Channels
-        muteChannel(SW_INSTR, FD);
-        SW_LED_FadeSingle_DW(SW_Pad, SAVE_ON, COL_OFF,  FS, FD); // Update LED Stripe
-        SW_LED_ShutDown();
-        resetMachine();
-     }
      SW_LED_FadeSingle_DW(SW_Pad, COL_ON, COL_OFF,  FS, FD); // Update LED Stripe
-   }
+      }
   }
-   return SW_Pad;
+  return SW_Pad;
 }
 
 SWPAD readSW_SLEEP(SWPAD SW_Pad){ // Should Remove arraySize somehow
