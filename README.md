@@ -38,9 +38,9 @@ The collaborators of this project are:
 ![](https://github.com/Autofabricantes/Henar-3/blob/master/00_General/00_Logos/Logo_Autofabricantes.png?raw=true)
 
 ### Website: www.autofabricantes.org
-### Contact: [HERE MAIL]
+### Contact: info@autofabricantes.org
 
-## Autofabricantes
+## Escuela de Oficios Electrosonoros
 _**Escuela de Oficios Electrosonoros**_ (in eng. _**School for Electrosonic Crafts**_) is an artistic and educational project that works to make electronic music (or music made with technology in general) accesible to everyone. 
 
 *  Elaborate a feministic (or better just... diverse) history of electronic music.
@@ -51,7 +51,6 @@ _**Escuela de Oficios Electrosonoros**_ (in eng. _**School for Electrosonic Craf
 
 ### Website: www.oficioselectrosonoros.org
 ### Contact: gurrupibaby@gmail.com
-
 
 # About the previous Henar (Henar#1, Henar#2)
 The Un instrumento para Henar project has already developed two previous versions of the instruments.
