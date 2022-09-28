@@ -29,6 +29,9 @@ The collaborators of this project are:
 
 ![](https://github.com/Autofabricantes/Henar-3/blob/master/00_General/00_Logos/Logo_UnInstrumentoParaHenar.png?raw=true)
 
+### Website: www.centroceleo.es/henar
+### Contact: uninstrumentoparahenar@gmail.com
+
 ## Autofabricantes
 **_Autofabricantes_** in an association based in _Medialab-Prado_, Madrid. It develops several _Open Source_ technological solutions in the medical and accesibility field. It's main development lines right now are:
 * Myoelectric Hand Prothesis for children.
