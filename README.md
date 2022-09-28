@@ -59,7 +59,7 @@ The Un instrumento para Henar project has already developed two previous version
 ## Henar#1: [HERE LINK]
 ## Henar#2: [HERE LINK]
 
-The **_Henar#3_**improvement objetives are:
+The **_Henar#3_** improvement objetives are:
 * Increase System flexibility.
 * Easier Assembly and manufacturing.
 * Easier MIDI configuration.
