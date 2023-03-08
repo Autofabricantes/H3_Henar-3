@@ -8,7 +8,7 @@ The **_Henar#3_** is a _Open Source_ MIDI percussion instrument designed to perf
 * **Open Source:** The **_Henar#3_** has been designed and build with **_Open Source_** HW and SW and using accesible manufacturing technologies in order for it to be very affordable and easily moded.
 * **Build Flexibility:** The **_Henar#3_** has been designed to allow a large number of different configurations (HMI elements in order to cope with the specific necessities of each user.
 * **Stand Alone:** The **_Henar#3_** is an instrument designed to be played live, therefore it is a _Plug&Play_ device which does not need of extra elements to be played.
-* **Pheriperic Flexibility:** Besides being a _Plug&Play_ device, the **_Henar#3_** allows its connection with other sound devices such as speakers and alternative MIDI devices.
+* **Periperic Flexibility:** Besides being a _Plug&Play_ device, the **_Henar#3_** allows its connection with other sound devices such as speakers and alternative MIDI devices.
 
 ![](https://github.com/Autofabricantes/Henar-3/blob/master/00_General/01_ProjectImages/H3_GeneralPhoto_0.jpg?raw=true)
 ![](https://github.com/Autofabricantes/Henar-3/blob/master/00_General/01_ProjectImages/H3_GeneralPhoto_1.jpg?raw=true)
@@ -16,7 +16,7 @@ The **_Henar#3_** is a _Open Source_ MIDI percussion instrument designed to perf
 # History and Collaborators
 The **_Henar#3_** is part of a longer project started by the **_Celeo Proyectos_** and **_Un Instrumento para Henar_** in 2015. Its initial objective is to build a proper adapted instrument for Henar, a woman from Cuenca (Spain) that plays in an orchestra.
 
-Apart from the instrument (which has two previous versions which will be described later) the project aims to build up a platform for the community of developers, users and enthusiasts to work together towards new ways to socialize with music and make it accesible for everyone. This is achieved not only though the development of the instrument itself but also through the creation of didactic materials and the organization of events such as **_DiverS+S 2017_** (http://www.diversos.eu/), where various projects were presented and put in common, in order to create links and an active net.
+Apart from the instrument (which has two previous versions which will be described later) the project aims to build up a platform for the community of developers, users and enthusiasts to work together towards new ways to socialize with music and make it accesible for everyone. This is achieved not only through the development of the instrument itself but also through the creation of didactic materials and the organization of events such as **_DiverS+S 2017_** (http://www.diversos.eu/), where various projects were presented and put in common, in order to create links and an active net.
 
 ![](https://github.com/Autofabricantes/Henar-3/blob/master/00_General/00_Logos/Logo_Diversos.png?raw=true)
 
